@@ -1,0 +1,8 @@
+{
+  "name": "academic-literature-guide-v2",
+  "version": "2.0.0",
+  "author": "@lobsterai",
+  "description": "文献导读助手 2.0 - 全自动 PDF 提取 + 文献导读一体化技能",
+  "dependencies": ["mineru-open-api"],
+  "created": "2026-03-27"
+}
