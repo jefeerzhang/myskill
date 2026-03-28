@@ -1,28 +1,21 @@
-# 📚 文献导读助手 - 全自动学术文献解读专家
+# LobsterAI 技能合集：文献导读助手 & 开题报告评审专家
 
-> **一键完成「PDF 提取 → 文献导读」全流程**  
-> 让学术论文阅读效率提升 300% 🚀
+> 本仓库包含两个可导入 LobsterAI / OpenClaw 的技能：
+> - `academic-literature-guide-v2`：PDF/URL → 四层递进式文献导读（依赖 MinerU，可做 Web Search 验证）
+> - `proposal-review-expert`：开题报告分级评审（本科/硕士/博士，可选 AnythingLLM RAG 验证）
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D16-green.svg)](https://nodejs.org/)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)](https://github.com/yourusername/academic-literature-guide)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)](#)
 
 ---
 
-## 🎯 项目简介
+## 🎯 技能清单
 
-文献导读助手是一个专为科研人员、研究生和学术爱好者设计的全自动文献解读工具。只需提供 PDF 文件或论文链接，即可自动生成**四层递进式导读报告**，帮助你快速理解论文核心内容。
-
-### 核心功能
-
-| 功能 | 说明 | 优势 |
-|------|------|------|
-| **PDF 自动提取** | 使用 MinerU 将 PDF 转换为 Markdown | 支持表格、公式、OCR 识别 |
-| **4 层递进导读** | 直觉层→概念层→技术层→批判层 | 由浅入深，适合不同水平的读者 |
-| **LaTeX 公式渲染** | 自动保留原文的数学公式格式 | 完美支持理工科论文 |
-| **智能模式选择** | 根据文件大小自动选择提取模式 | 小文件快速处理，大文件精确提取 |
-| **知识族谱图** | 自动生成论文的知识脉络关系图 | 快速定位论文在领域中的位置 |
-| **一键输出** | 自动保存到指定目录 | 无需手动配置，开箱即用 |
+| 技能目录/包                     |  版本 | 简介                                                 | 处理 PDF       | 可选增强        | 默认输出目录      |
+| ------------------------------- | ----: | ---------------------------------------------------- | -------------- | --------------- | ----------------- |
+| `academic-literature-guide-v2/` | 2.0.0 | 文献导读：直觉层→概念层→技术层→批判层                | MinerU         | Web Search 验证 | `./文献导读/`     |
+| `proposal-review-expert`        | 1.0.0 | 开题评审：按学位层级动态标准 + 致命伤预警 + 重构建议 | MinerU（可选） | AnythingLLM RAG | `./开题报告评审/` |
 
 ---
 
@@ -30,128 +23,177 @@
 
 ### 前置要求
 
-- [OpenClaw / LobsterAI](https://github.com/openclaw/openclaw) - 已安装并运行
-- [Node.js](https://nodejs.org/) - v16 或更高版本
-- [MinerU CLI](https://mineru.net) - PDF 提取工具
+- [OpenClaw / LobsterAI](https://github.com/openclaw/openclaw) 已安装并运行
+- [Node.js](https://nodejs.org/) v16 或更高版本（仅在需要安装 MinerU CLI 时）
+- [MinerU CLI](https://mineru.net)（可选，但建议安装：两项技能在处理 PDF 时会用到）
+- AnythingLLM（可选：仅 `proposal-review-expert` 启用 RAG 时使用）
 
-### 1. 安装 MinerU CLI
+### 1) 安装 MinerU CLI（可选但建议）
 
 ```bash
-# 所有平台
 npm install -g mineru-open-api
+```
 
-# macOS/Linux 如遇到权限问题
+macOS/Linux 如遇到权限问题：
+
+```bash
 npm install -g mineru-open-api --prefix ~/.local
 ```
 
-### 2. 安装技能
+### 2) 安装技能
 
-**macOS / Linux**:
+#### 安装 `academic-literature-guide-v2`（文件夹形式）
+
+macOS / Linux：
+
 ```bash
 cp -r academic-literature-guide-v2 ~/Library/Application\ Support/LobsterAI/SKILLs/
 ```
 
-**Windows** (PowerShell):
+Windows（PowerShell）：
+
 ```powershell
 Copy-Item -Path "academic-literature-guide-v2" -Destination "$env:APPDATA\LobsterAI\SKILLs\" -Recurse
 ```
 
-### 3. 配置 API Token（可选）
+#### 安装 `proposal-review-expert`（zip 包）
+
+该技能以 `proposal-review-expert.zip` 提供；安装时需要确保它位于独立目录 `proposal-review-expert/` 下（目录内包含 `_meta.json`、`SKILL.md`、`README.md` 等）。
+
+macOS / Linux：
 
 ```bash
-# 获取 Token: https://mineru.net/apiManage/token
+mkdir -p ~/Library/Application\ Support/LobsterAI/SKILLs/proposal-review-expert
+unzip -o proposal-review-expert.zip -d ~/Library/Application\ Support/LobsterAI/SKILLs/proposal-review-expert
+```
+
+Windows（PowerShell）：
+
+```powershell
+$dest = Join-Path $env:APPDATA "LobsterAI\\SKILLs\\proposal-review-expert"
+New-Item -ItemType Directory -Force -Path $dest | Out-Null
+tar -xf "proposal-review-expert.zip" -C $dest
+```
+
+安装后如 LobsterAI 已在运行，重启一次以刷新技能列表。
+
+### 3) 配置 MinerU Token（可选）
+
+如果你需要使用 MinerU 的高精度提取模式（例如大文件、复杂排版、OCR），先获取 Token 并配置：
+
+```bash
 mineru-open-api auth
 ```
 
-### 4. 验证安装
+### 4) 验证安装
 
-在 LobsterAI 中发送：
+在 LobsterAI 中分别发送：
+
 ```
 文献导读技能
+```
+
+```
+开题报告评审
 ```
 
 ---
 
 ## 📖 使用方法
 
-### 基本用法
+### 技能 1：文献导读助手（`academic-literature-guide-v2`）
 
-**本地 PDF 文件**:
+本地 PDF 文件：
+
 ```
 帮我解读这篇 PDF：/path/to/paper.pdf
 ```
 
-**URL 链接**:
+URL 链接：
+
 ```
 帮我解读这个链接的论文：https://arxiv.org/pdf/2509.22186
 ```
 
-**DOI 或标题**:
+DOI 或标题：
+
 ```
 帮我生成 10.1080/xxxx 这篇论文的导读
 ```
 
-### 输出示例
+输出（默认）：
+- 自动保存到 `./文献导读/`
 
-技能会自动生成四层递进式导读报告：
+### 技能 2：开题报告评审专家（`proposal-review-expert`）
 
-1. **🟢 直觉层** - 用生活场景理解问题
-2. **🔵 概念层** - 引入必要术语
-3. **🟡 技术层** - 拆解研究方法
-4. **🔴 批判层** - 培养科学怀疑精神
+评审 PDF：
 
-报告自动保存到 `./文献导读/` 目录。
+```
+评审这份开题报告 PDF：C:\Users\...\开题报告.pdf
+```
+
+评审文本：
+
+```
+评审这份开题报告（硕士层次）
+[粘贴开题报告全文]
+```
+
+启用 RAG（AnythingLLM）：
+
+```
+评审这份开题，启用 RAG
+```
+
+输出（默认）：
+- 自动保存到 `./开题报告评审/`
 
 ---
 
 ## 📦 项目结构
 
 ```
-academic-literature-guide/
-├── academic-literature-guide-v2/       # 技能主目录
-│   ├── SKILL.md                        # 技能核心逻辑
-│   ├── README.md                       # 详细使用文档
-│   ├── CHECKLIST.md                    # 质量检查清单
-│   ├── _meta.json                      # 技能元数据
-│   ├── scripts/
-│   │   └── mineru-extract.ps1          # Windows 自动化脚本
-│   └── 分享说明_给测试者.md            # 反馈模板
-├── 安装指南.md                          # 3 分钟快速安装教程
-├── 使用说明.md                          # 最佳实践与故障排查
-├── README.md                           # 本文件
+myskill/
+├── academic-literature-guide-v2/       # 技能：文献导读助手（目录）
+├── proposal-review-expert.zip          # 技能：开题报告评审专家（zip 包）
+├── 安装指南.md                          # 文献导读助手：3 分钟快速安装
+├── 使用说明.md                          # 文献导读助手：最佳实践与故障排查
+├── PUSH_GUIDE.md                        # 推送到 GitHub 的指引
+├── README.md                            # 本文件
 └── .gitignore
 ```
 
 ---
 
-## ⚡ 两种提取模式
+## ⚡ MinerU 两种提取模式（适用于 PDF 场景）
 
-| 特性 | flash-extract | extract |
-|------|--------------|---------|
-| 适用场景 | 小文件（<10MB, <20 页） | 大文件或复杂排版 |
-| 速度 | 快（5-10 秒/页） | 中等（10-30 秒/页） |
-| 精度 | 标准 | 高精度 |
-| Token | ❌ 无需 | ✅ 需要 |
-| 成本 | 免费 | 免费配额 + 付费 |
+| 特性     | flash-extract           | extract             |
+| -------- | ----------------------- | ------------------- |
+| 适用场景 | 小文件（<10MB, <20 页） | 大文件或复杂排版    |
+| 速度     | 快（5-10 秒/页）        | 中等（10-30 秒/页） |
+| 精度     | 标准                    | 高精度              |
+| Token    | 无需                    | 需要                |
+| 成本     | 免费                    | 免费配额 + 付费     |
 
-**建议**：首次使用可先试用 flash-extract，需要时再配置 Token。
+建议：首次使用可先试用 flash-extract，需要时再配置 Token。
 
 ---
 
 ## 🛠️ 故障排查
 
-### 问题 1: 安装时提示权限不足
+### 问题 1：安装 MinerU 时提示权限不足
 
-**macOS/Linux**:
+macOS/Linux：
+
 ```bash
 npm install -g mineru-open-api --prefix ~/.local
 ```
 
-**Windows**:
+Windows：
 - 以管理员身份运行 PowerShell
 - 或修改 npm 全局目录权限
 
-### 问题 2: 提取内容为空
+### 问题 2：PDF 提取内容为空
 
 可能原因：
 - PDF 加密或损坏
@@ -163,41 +205,29 @@ npm install -g mineru-open-api --prefix ~/.local
 2. 尝试 extract 模式（支持 OCR）
 3. 检查网络连接
 
-### 问题 3: 公式显示异常
+### 问题 3：公式显示异常
 
 确保你的 Markdown 阅读器支持 LaTeX 渲染：
-- VS Code + Markdown All in One 插件 ✅
-- Typora ✅
-- Obsidian ✅
+- VS Code + Markdown All in One 插件
+- Typora
+- Obsidian
 
 ---
 
 ## 📚 文档
 
-| 文档 | 说明 |
-|------|------|
-| [安装指南.md](./安装指南.md) | 3 分钟快速安装教程 |
-| [使用说明.md](./使用说明.md) | 最佳实践与故障排查 |
-| [academic-literature-guide-v2/README.md](./academic-literature-guide-v2/README.md) | 技能完整文档 |
+| 文档                                                                               | 说明                             |
+| ---------------------------------------------------------------------------------- | -------------------------------- |
+| [安装指南.md](./安装指南.md)                                                       | 文献导读助手：3 分钟快速安装     |
+| [使用说明.md](./使用说明.md)                                                       | 文献导读助手：最佳实践与故障排查 |
+| [academic-literature-guide-v2/README.md](./academic-literature-guide-v2/README.md) | 文献导读助手：完整文档           |
+| `proposal-review-expert` 解压后的 `README.md`                                      | 开题报告评审专家：完整文档       |
 
 ---
 
 ## 🤝 贡献
 
 欢迎提交 Issue 和 Pull Request！
-
-### 开发环境设置
-
-```bash
-# 克隆仓库
-git clone https://github.com/yourusername/academic-literature-guide.git
-
-# 进入目录
-cd academic-literature-guide
-
-# 安装依赖
-npm install -g mineru-open-api
-```
 
 ### 提交规范
 
@@ -213,7 +243,7 @@ npm install -g mineru-open-api
 
 ## 📄 许可证
 
-本项目基于 **MIT 许可证** 开源。
+本项目基于 MIT 许可证开源。
 
 ```
 MIT License
@@ -243,18 +273,6 @@ SOFTWARE.
 
 ## 🔗 相关链接
 
-- [OpenClaw / LobsterAI](https://github.com/openclaw/openclaw) - AI 助手框架
-- [MinerU](https://mineru.net) - PDF 提取工具
-- [ClawHub](https://clawhub.com) - 技能市场
-
----
-
-## 📞 联系方式
-
-- 📧 Email: your.email@example.com
-- 💬 Issues: [GitHub Issues](https://github.com/yourusername/academic-literature-guide/issues)
-- 📖 文档：[完整文档](./academic-literature-guide-v2/README.md)
-
----
-
-**Made with ❤️ for researchers worldwide**
+- [OpenClaw / LobsterAI](https://github.com/openclaw/openclaw)
+- [MinerU](https://mineru.net)
+- [ClawHub](https://clawhub.com)
