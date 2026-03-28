@@ -15,7 +15,13 @@
 | 技能目录/包                     |  版本 | 简介                                                 | 处理 PDF       | 可选增强        | 默认输出目录      |
 | ------------------------------- | ----: | ---------------------------------------------------- | -------------- | --------------- | ----------------- |
 | `academic-literature-guide-v2/` | 2.0.0 | 文献导读：直觉层→概念层→技术层→批判层                | MinerU         | Web Search 验证 | `./文献导读/`     |
-| `proposal-review-expert`        | 1.0.0 | 开题评审：按学位层级动态标准 + 致命伤预警 + 重构建议 | MinerU（可选） | AnythingLLM RAG | `./开题报告评审/` |
+| `proposal-review-expert/`       | 2.0.0 | 开题评审：按学位层级动态标准 + 致命伤预警 + 重构建议 | MinerU（可选） | AnythingLLM RAG | `./开题报告评审/` |
+
+## 🆕 proposal-review-expert 2.0 更新要点
+
+- 新增：AnythingLLM RAG 文献专项验证流程（可选启用）
+- 增强：评审报告中更系统地呈现“文献对照/致命伤证据/补充文献建议”
+- 增强：提供 `rag_query.py` 工具脚本与可复用的检索输出格式
 
 ---
 
@@ -56,23 +62,18 @@ Windows（PowerShell）：
 Copy-Item -Path "academic-literature-guide-v2" -Destination "$env:APPDATA\LobsterAI\SKILLs\" -Recurse
 ```
 
-#### 安装 `proposal-review-expert`（zip 包）
-
-该技能以 `proposal-review-expert.zip` 提供；安装时需要确保它位于独立目录 `proposal-review-expert/` 下（目录内包含 `_meta.json`、`SKILL.md`、`README.md` 等）。
+#### 安装 `proposal-review-expert`（文件夹形式）
 
 macOS / Linux：
 
 ```bash
-mkdir -p ~/Library/Application\ Support/LobsterAI/SKILLs/proposal-review-expert
-unzip -o proposal-review-expert.zip -d ~/Library/Application\ Support/LobsterAI/SKILLs/proposal-review-expert
+cp -r proposal-review-expert ~/Library/Application\ Support/LobsterAI/SKILLs/
 ```
 
 Windows（PowerShell）：
 
 ```powershell
-$dest = Join-Path $env:APPDATA "LobsterAI\\SKILLs\\proposal-review-expert"
-New-Item -ItemType Directory -Force -Path $dest | Out-Null
-tar -xf "proposal-review-expert.zip" -C $dest
+Copy-Item -Path "proposal-review-expert" -Destination "$env:APPDATA\LobsterAI\SKILLs\" -Recurse
 ```
 
 安装后如 LobsterAI 已在运行，重启一次以刷新技能列表。
@@ -155,7 +156,7 @@ DOI 或标题：
 ```
 myskill/
 ├── academic-literature-guide-v2/       # 技能：文献导读助手（目录）
-├── proposal-review-expert.zip          # 技能：开题报告评审专家（zip 包）
+├── proposal-review-expert/             # 技能：开题报告评审专家（目录）
 ├── 安装指南.md                          # 文献导读助手：3 分钟快速安装
 ├── 使用说明.md                          # 文献导读助手：最佳实践与故障排查
 ├── PUSH_GUIDE.md                        # 推送到 GitHub 的指引
@@ -221,7 +222,7 @@ Windows：
 | [安装指南.md](./安装指南.md)                                                       | 文献导读助手：3 分钟快速安装     |
 | [使用说明.md](./使用说明.md)                                                       | 文献导读助手：最佳实践与故障排查 |
 | [academic-literature-guide-v2/README.md](./academic-literature-guide-v2/README.md) | 文献导读助手：完整文档           |
-| `proposal-review-expert` 解压后的 `README.md`                                      | 开题报告评审专家：完整文档       |
+| [proposal-review-expert/README.md](./proposal-review-expert/README.md)             | 开题报告评审专家：完整文档       |
 
 ---
 

@@ -1,0 +1,9 @@
+{
+  "name": "proposal-review-expert",
+  "version": "2.0.0",
+  "author": "@user",
+  "description": "高级开题报告评审专家 - 专注于量化实证研究的深度评估",
+  "dependencies": [],
+  "created": "2026-03-27",
+  "research-type": "quantitative-empirical"
+}
