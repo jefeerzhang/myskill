@@ -37,7 +37,7 @@
   - [x] dependencies 字段
 
 - [x] **scripts/** - 脚本目录（可选）
-  - [ ] mineru-extract.ps1 - PowerShell 自动化脚本
+  - [x] mineru-extract.ps1 - PowerShell 自动化脚本
 
 ---
 

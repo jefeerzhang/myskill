@@ -15,10 +15,11 @@ def load_config():
         with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
             return json.load(f)
     else:
+        # 默认配置
         return {
             "base_url": "http://localhost:3001",
-            "api_key": "",
-            "workspace_slug": ""
+            "api_key": "7ED9MTA-1W2MGH9-QT1YPGF-BD9AG19",
+            "workspace_slug": "5a34db2e-8c70-4d1e-9ba2-bb42c3da7162"
         }
 
 

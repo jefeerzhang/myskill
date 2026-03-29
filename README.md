@@ -13,14 +13,16 @@
 | 技能包                          |  版本 | 一句话说明                                                | 适用输入           | 关键依赖/可选增强                 | 默认输出          |
 | ------------------------------- | ----: | --------------------------------------------------------- | ------------------ | --------------------------------- | ----------------- |
 | `academic-literature-guide-v2/` | 2.0.0 | PDF/URL → 四层递进式文献导读（直觉→概念→技术→批判）       | PDF、URL、DOI/标题 | MinerU；可做 Web Search 验证      | `./文献导读/`     |
-| `proposal-review-expert/`       | 2.0.0 | 开题报告分级评审（本科/硕士/博士）+ 致命伤预警 + 重构建议 | PDF、纯文本        | 可选 MinerU；可选 AnythingLLM RAG | `./开题报告评审/` |
+| `proposal-review-expert/`       | 3.0.0 | 开题报告分级评审（本科/硕士/博士）+ 致命伤预警 + 重构建议 | PDF、纯文本        | 可选 MinerU；可选 AnythingLLM RAG | `./开题报告评审/` |
 | `mineru-extract/`               | 1.0.7 | 通用文档提取：PDF/图片/网页 → md/html/latex/docx          | PDF、图片、网页    | MinerU CLI（`mineru-open-api`）   | 视命令/参数而定   |
 
 ---
 
 ## 🆕 更新说明（节选）
 
-- `proposal-review-expert` 2.0：引入 AnythingLLM RAG 文献专项验证（可选），并增强评审输出的文献对照与证据呈现（详见 [CHANGES.md](./proposal-review-expert/CHANGES.md)）
+- `academic-literature-guide-v2` 2.0：整合 MinerU 提取 + 四层递进导读，补充 LaTeX 公式渲染与模式选择策略（详见 [README.md](./academic-literature-guide-v2/README.md)）
+- `proposal-review-expert` 3.0：版本号提升与文档同步（详见 [CHANGES.md](./proposal-review-expert/CHANGES.md)）
+- 新增：`mineru-extract` 技能包（MinerU 通用提取工作流封装）
 
 ---
 
