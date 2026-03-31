@@ -55,13 +55,13 @@ npm install -g mineru-open-api --prefix ~/.local
 macOS / Linux：
 
 ```bash
-cp -r academic-literature-guide-v2 material-ideation proposal-review-expert mineru-extract ~/Library/Application\ Support/LobsterAI/SKILLs/
+cp -r academic-literature-guide-v2 material-ideation proposal-review-expert ~/Library/Application\ Support/LobsterAI/SKILLs/
 ```
 
 Windows（PowerShell）：
 
 ```powershell
-Copy-Item -Path "academic-literature-guide-v2","material-ideation","proposal-review-expert","mineru-extract" -Destination "$env:APPDATA\LobsterAI\SKILLs\" -Recurse
+Copy-Item -Path "academic-literature-guide-v2","material-ideation","proposal-review-expert" -Destination "$env:APPDATA\LobsterAI\SKILLs\" -Recurse
 ```
 
 如果 LobsterAI 已在运行，重启一次以刷新技能列表。
@@ -80,10 +80,6 @@ Copy-Item -Path "academic-literature-guide-v2","material-ideation","proposal-rev
 
 ```
 材料构思
-```
-
-```
-mineru
 ```
 
 ---
@@ -121,12 +117,6 @@ mineru
 基于这些材料提出研究问题、假设与识别策略：/path/to/materials/
 ```
 
-### 4) MinerU 通用提取（`mineru-extract`）
-
-```
-用 mineru 把这个 PDF 提取成 Markdown：/path/to/file.pdf
-```
-
 ---
 
 ## 📦 仓库结构
@@ -136,7 +126,6 @@ myskill/
 ├── academic-literature-guide-v2/
 ├── material-ideation/
 ├── proposal-review-expert/
-├── mineru-extract/
 ├── 安装指南.md
 ├── 使用说明.md
 ├── PUSH_GUIDE.md
@@ -155,7 +144,6 @@ myskill/
 | [academic-literature-guide-v2/README.md](./academic-literature-guide-v2/README.md) | 文献导读助手：完整文档           |
 | [material-ideation/SKILL.md](./material-ideation/SKILL.md)                         | 材料构思：工作流与输出规范       |
 | [proposal-review-expert/README.md](./proposal-review-expert/README.md)             | 开题报告评审专家：完整文档       |
-| [mineru-extract/SKILL.md](./mineru-extract/SKILL.md)                               | MinerU 通用提取：命令与能力清单  |
 
 ---
 
