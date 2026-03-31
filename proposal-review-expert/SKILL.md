@@ -766,7 +766,7 @@ mineru-open-api extract "C:\path\to\开题报告.pdf" -o ./mineru_extract/<filen
 🎓 学位层级：[本科/硕士/博士]
 🔍 RAG 验证：[启用/未启用]
 ⏱️ **预计耗时**：[X] 分钟
-⚠️ **RAG 配置**：每次查询超时 100 秒，合计上限 8 分钟
+⚠️ **RAG 配置**：每次查询超时 300 秒，合计上限 25 分钟
 
 开始执行评审，将在关键节点更新进度...
 ```
@@ -895,8 +895,8 @@ def rag_query(question, workspace_slug, api_key, base_url="http://localhost:3001
     url = f"{base_url}/api/v1/workspace/{workspace_slug}/chat"
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
     payload = {"message": question}
-    # 每次查询超时 100 秒，动态次数查询合计上限 8 分钟
-    response = requests.post(url, json=payload, headers=headers, timeout=100)
+    # 每次查询超时 300 秒，动态次数查询合计上限 25 分钟
+    response = requests.post(url, json=payload, headers=headers, timeout=300)
     return response.json()
 
 # 查询示例
@@ -1103,8 +1103,8 @@ print(result.get('sources', []))
 |------|---------|
 | RAG 检索返回 404 | 检查工作区 Slug 是否正确 |
 | RAG 检索返回 401 | 检查 API Key 是否有效 |
-| RAG 检索超时（>100 秒/次） | 检查 AnythingLLM 服务是否运行；LLM 模型响应速度是否过慢 |
-| RAG 合计超时（>8 分钟） | 减少查询次数或优化查询关键词；考虑更换更快的 LLM 模型 |
+| RAG 检索超时（>300 秒/次） | 检查 AnythingLLM 服务是否运行；LLM 模型响应速度是否过慢 |
+| RAG 合计超时（>25 分钟） | 减少查询次数或优化查询关键词；考虑更换更快的 LLM 模型 |
 | 检索结果为空 | 确认知识库中已有相关文献；检查 Embedding 模型是否正常工作 |
 | 检索结果不相关 | 优化查询关键词或补充领域文献 |
 

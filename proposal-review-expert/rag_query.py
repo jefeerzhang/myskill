@@ -23,7 +23,7 @@ def load_config():
         }
 
 
-def rag_query(question, base_url=None, api_key=None, workspace_slug=None, timeout=180):
+def rag_query(question, base_url=None, api_key=None, workspace_slug=None, timeout=300):
     """
     向 AnythingLLM 发起 RAG 查询
     
