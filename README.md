@@ -1,21 +1,20 @@
-# LobsterAI / OpenClaw / CoPaw 技能包合集
+# 科研技能包合集（OpenClaw / LobsterAI / CoPaw）
 
-本仓库提供多个可直接导入 LobsterAI / OpenClaw / CoPaw 的技能包，覆盖「文献导读」「开题评审」「同行评议」「基于材料的研究构思」等高频场景。
+本仓库提供 4 个围绕“做科研流程”的技能：材料构思 → 文献导读 → 开题评审 → 同行评议（审稿与回复）。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js](https://img.shields.io/badge/node-%3E%3D16-green.svg)](https://nodejs.org/)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)](#)
 
 ---
 
 ## 🎯 技能清单
 
-| 技能包                          |  版本 | 一句话说明                                                | 适用输入                       | 关键依赖/可选增强                        | 默认输出                     |
-| ------------------------------- | ----: | --------------------------------------------------------- | ------------------------------ | ---------------------------------------- | ---------------------------- |
-| `academic-literature-guide-v2/` | 2.0.0 | PDF/URL → 四层递进式文献导读（直觉→概念→技术→批判）       | PDF、URL、DOI/标题             | MinerU；可做 Web Search 验证             | `./文献导读/`                |
-| `proposal-review-expert/`       | 1.0.0 | 开题报告分级评审（本科/硕士/博士）+ 致命伤预警 + 重构建议 | PDF、纯文本                    | 可选 MinerU；可选 AnythingLLM RAG        | `./开题报告评审/`            |
-| `peer-review/`                  | 2.0.0 | 同行评审/审稿意见回复：方法学、统计严谨性、规范与回复模板 | 论文全文、审稿意见、基金申请书 | 报告规范清单（CONSORT/STROBE/PRISMA 等） | 对话输出（可整理为审稿报告） |
-| `material-ideation/`            |     — | 材料/文件夹 → 研究问题 + 假设 + 识别策略                  | 文件夹、PDF/Word/MD            | 依赖本地文件读取；可选 RAG               | `./研究构想/<材料名称>/`     |
+| 技能包                          |  版本 | 一句话说明                                                | 适用输入                       | 关键依赖/可选增强                      | 默认输出                     |
+| ------------------------------- | ----: | --------------------------------------------------------- | ------------------------------ | -------------------------------------- | ---------------------------- |
+| `academic-literature-guide-v2/` | 2.0.0 | PDF/URL → 四层递进式文献导读（直觉→概念→技术→批判）       | PDF、URL、DOI/标题             | 可选：检索验证（Web Search）           | `./文献导读/`                |
+| `proposal-review-expert/`       | 1.0.0 | 开题报告分级评审（本科/硕士/博士）+ 致命伤预警 + 重构建议 | PDF、纯文本                    | 可选：RAG 验证（AnythingLLM 等）       | `./开题报告评审/`            |
+| `peer-review/`                  | 2.0.0 | 同行评议/审稿意见回复：双轨评审（正常/批判）+ 原则 + 模板 | 论文全文、审稿意见、基金申请书 | 参考规范与模板（见 `templates.md` 等） | 对话输出（可整理为审稿报告） |
+| `material-ideation/`            |     — | 材料/文件夹 → 研究问题 + 假设 + 识别策略                  | 文件夹、PDF/Word/MD            | 依赖本地文件读取；可选 RAG             | `./研究构想/<材料名称>/`     |
 
 ---
 
@@ -39,7 +38,7 @@ flowchart TD
   H -->|通过| I[数据收集与实证分析\n（你自己执行）]
 
   I --> J[论文初稿/基金稿/答辩稿]
-  J -->|peer-review\n同行评议| K[审稿报告/逐条回复建议/规范检查]
+  J -->|peer-review\n同行评议| K[正常版评审 + 批判版审计 + 回复模板]
   K --> L{需要返工?}
   L -->|补实验/补稳健性| I
   L -->|补文献/重写论证| D
@@ -48,7 +47,7 @@ flowchart TD
   K --> M[投稿/基金提交/终稿定稿]
 ```
 
-## ✅ 触发条件（除 mineru）
+## ✅ 触发条件
 
 下表来自各技能 `SKILL.md` 中的【触发场景 / 触发关键词】描述，用于你快速判断“该用哪个技能”。
 
@@ -74,22 +73,9 @@ flowchart TD
 ### 前置要求
 
 - [OpenClaw / LobsterAI](https://github.com/openclaw/openclaw) 已安装并运行
-- 如需处理 PDF/图片/网页提取：安装 MinerU CLI（`mineru-open-api`）
 - 如需 `proposal-review-expert` 启用 RAG：本地或远程可访问的 AnythingLLM（可选）
 
-### 1) 安装 MinerU CLI（推荐）
-
-```bash
-npm install -g mineru-open-api
-```
-
-macOS/Linux 如遇到权限问题：
-
-```bash
-npm install -g mineru-open-api --prefix ~/.local
-```
-
-### 2) 安装技能包（复制目录）
+### 1) 安装 OpenClaw / LobsterAI 技能（3 个）
 
 macOS / Linux：
 
@@ -105,7 +91,7 @@ Copy-Item -Path "academic-literature-guide-v2","material-ideation","proposal-rev
 
 如果 LobsterAI 已在运行，重启一次以刷新技能列表。
 
-### 2.1) 安装 CoPaw 技能（同行评议）
+### 2) 安装 CoPaw 技能（同行评议）
 
 `peer-review/` 为 CoPaw workspace 技能目录结构（与 OpenClaw/LobsterAI 的 `SKILLs/` 不同）。
 
@@ -187,10 +173,32 @@ Copy-Item -Path "peer-review" -Destination "$env:USERPROFILE\.copaw\skills\" -Re
 ```
 
 ```
-帮我逐条回复以下审稿意见：...
+我收到了审稿意见，帮我写逐条回复（中英文各一份）：...
+```
+
+```
+请对这篇论文进行同行评议，并输出正常版 + 批判版两份报告：...
 ```
 
 ---
+
+## 📝 三个技能更新（Markdown）
+
+### peer-review v2.0
+
+- 新增“双轨评审模式”：正常版用于常规场景，批判版用于深度审计
+- 引入“五大批判性原则”：因果推断边界、未测量变量威胁、可推广性边界、学术辩论定位、缺失关键文献
+- 输出与素材拆分：参考 `templates.md`（报告/回复模板）与 `references.md`（规范/检查清单）
+
+### proposal-review-expert（开题评审）
+
+- 评审对象限定为开题报告/研究计划/Proposal（研究开始前）
+- 强化“层级校验优先 + 核心变量界定必须审查”的铁律，并固定输出结构（五维评估→变量审查→致命伤→重构→结论）
+
+### material-ideation（材料构思）
+
+- 触发更严格：需要用户提供具体材料（文件夹/文件路径）才进入材料驱动构思
+- 输出更可执行：在材料提炼基础上生成研究问题、假设与识别策略（而非泛泛头脑风暴）
 
 ## 📦 仓库结构
 
@@ -218,13 +226,13 @@ myskill/
 | [academic-literature-guide-v2/README.md](./academic-literature-guide-v2/README.md) | 文献导读助手：完整文档           |
 | [material-ideation/SKILL.md](./material-ideation/SKILL.md)                         | 材料构思：工作流与输出规范       |
 | [peer-review/README.md](./peer-review/README.md)                                   | 同行评议：使用说明（v2.0）       |
-| [peer-review/CHANGES.md](./peer-review/CHANGES.md)                                 | 同行评议：更新记录               |
 | [proposal-review-expert/README.md](./proposal-review-expert/README.md)             | 开题报告评审专家：完整文档       |
+| [peer-review/templates.md](./peer-review/templates.md)                             | 同行评议：输出模板与回复模板     |
+| [peer-review/references.md](./peer-review/references.md)                           | 同行评议：参考规范与检查清单     |
 
 ---
 
 ## 🔗 相关链接
 
 - [OpenClaw / LobsterAI](https://github.com/openclaw/openclaw)
-- [MinerU](https://mineru.net)
 - [ClawHub](https://clawhub.com)

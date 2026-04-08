@@ -1,8 +1,12 @@
 {
   "name": "academic-literature-guide-v2",
+  "description": "学术文献全自动导读专家（默认版）。一键完成「PDF 提取→文献导读」全流程，将 PDF/URL 直接转化为由浅入深的知识架构（直觉层→概念层→技术层→批判层）。【触发场景】上传 PDF 文件、提供论文链接、请求解读文献、需要文献导读报告。【触发关键词】帮我读懂这篇、解读 PDF、生成导读、literature guide、explain this paper、一键导读、自动导读。【核心能力】PDF 自动提取（MinerU）、分级导读（科研小白/进阶人员/资深学者）、4 层递进讲解、LaTeX 公式渲染、知识族谱图、后续发展检索。【前置依赖】mineru-open-api CLI。",
+  "compatibility": "需要 mineru-open-api CLI（npm install -g mineru-open-api）；需要 web_fetch 或 browser 工具进行 Web Search 验证；需要 write 工具保存输出；支持 Windows/macOS/Linux 全平台",
+  "install_cmd": "npm install -g mineru-open-api",
+  "install_cmd_windows": "npm install -g mineru-open-api",
+  "license": "MIT",
   "version": "2.0.0",
-  "author": "@lobsterai",
-  "description": "文献导读助手 2.0 - 全自动 PDF 提取 + 文献导读一体化技能",
-  "dependencies": ["mineru-open-api"],
-  "created": "2026-03-27"
+  "author": "@user",
+  "created": "2026-03-27",
+  "updated": "2026-04-08"
 }
