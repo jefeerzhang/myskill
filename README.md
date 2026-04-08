@@ -14,7 +14,7 @@
 | ------------------------------- | ----: | --------------------------------------------------------- | ------------------------------ | ---------------------------------------- | ---------------------------- |
 | `academic-literature-guide-v2/` | 2.0.0 | PDF/URL → 四层递进式文献导读（直觉→概念→技术→批判）       | PDF、URL、DOI/标题             | MinerU；可做 Web Search 验证             | `./文献导读/`                |
 | `proposal-review-expert/`       | 1.0.0 | 开题报告分级评审（本科/硕士/博士）+ 致命伤预警 + 重构建议 | PDF、纯文本                    | 可选 MinerU；可选 AnythingLLM RAG        | `./开题报告评审/`            |
-| `同行评议/`                     |     — | 同行评审/审稿意见回复：方法学、统计严谨性、规范与回复模板 | 论文全文、审稿意见、基金申请书 | 报告规范清单（CONSORT/STROBE/PRISMA 等） | 对话输出（可整理为审稿报告） |
+| `peer-review/`                  | 2.0.0 | 同行评审/审稿意见回复：方法学、统计严谨性、规范与回复模板 | 论文全文、审稿意见、基金申请书 | 报告规范清单（CONSORT/STROBE/PRISMA 等） | 对话输出（可整理为审稿报告） |
 | `material-ideation/`            |     — | 材料/文件夹 → 研究问题 + 假设 + 识别策略                  | 文件夹、PDF/Word/MD            | 依赖本地文件读取；可选 RAG               | `./研究构想/<材料名称>/`     |
 
 ---
@@ -39,7 +39,7 @@ flowchart TD
   H -->|通过| I[数据收集与实证分析\n（你自己执行）]
 
   I --> J[论文初稿/基金稿/答辩稿]
-  J -->|同行评议\npeer-review| K[审稿报告/逐条回复建议/规范检查]
+  J -->|peer-review\n同行评议| K[审稿报告/逐条回复建议/规范检查]
   K --> L{需要返工?}
   L -->|补实验/补稳健性| I
   L -->|补文献/重写论证| D
@@ -107,20 +107,20 @@ Copy-Item -Path "academic-literature-guide-v2","material-ideation","proposal-rev
 
 ### 2.1) 安装 CoPaw 技能（同行评议）
 
-`同行评议/` 为 CoPaw workspace 技能目录结构（与 OpenClaw/LobsterAI 的 `SKILLs/` 不同）。
+`peer-review/` 为 CoPaw workspace 技能目录结构（与 OpenClaw/LobsterAI 的 `SKILLs/` 不同）。
 
 macOS / Linux（默认工作目录 `~/.copaw/`）：
 
 ```bash
 mkdir -p ~/.copaw/skills
-cp -r 同行评议 ~/.copaw/skills/
+cp -r peer-review ~/.copaw/skills/
 ```
 
 Windows（PowerShell，默认工作目录 `%USERPROFILE%\.copaw\`）：
 
 ```powershell
 New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.copaw\skills" | Out-Null
-Copy-Item -Path "同行评议" -Destination "$env:USERPROFILE\.copaw\skills\" -Recurse
+Copy-Item -Path "peer-review" -Destination "$env:USERPROFILE\.copaw\skills\" -Recurse
 ```
 
 ### 3) 验证安装
@@ -198,7 +198,7 @@ Copy-Item -Path "同行评议" -Destination "$env:USERPROFILE\.copaw\skills\" -R
 myskill/
 ├── academic-literature-guide-v2/
 ├── material-ideation/
-├── 同行评议/
+├── peer-review/
 ├── proposal-review-expert/
 ├── 安装指南.md
 ├── 使用说明.md
@@ -217,8 +217,8 @@ myskill/
 | [使用说明.md](./使用说明.md)                                                       | 文献导读助手：最佳实践与故障排查 |
 | [academic-literature-guide-v2/README.md](./academic-literature-guide-v2/README.md) | 文献导读助手：完整文档           |
 | [material-ideation/SKILL.md](./material-ideation/SKILL.md)                         | 材料构思：工作流与输出规范       |
-| [同行评议/README.md](./同行评议/README.md)                                         | 同行评议：适用场景与使用示例     |
-| [同行评议/CHANGES.md](./同行评议/CHANGES.md)                                       | 同行评议：更新记录               |
+| [peer-review/README.md](./peer-review/README.md)                                   | 同行评议：使用说明（v2.0）       |
+| [peer-review/CHANGES.md](./peer-review/CHANGES.md)                                 | 同行评议：更新记录               |
 | [proposal-review-expert/README.md](./proposal-review-expert/README.md)             | 开题报告评审专家：完整文档       |
 
 ---
