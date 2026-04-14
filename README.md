@@ -18,7 +18,7 @@
 | `社科基金选题说明撰写指南/`     | 0.1.0 | 社科基金“选题说明”（500 字以内）结构化写作与范例          | 选题信息/要点/政策依据         | 适配“基金申报”写作场景                  | 对话输出（可直接粘贴）       |
 | `material-ideation/`            |     — | 材料/文件夹 → 研究问题 + 假设 + 识别策略                  | 文件夹、PDF/Word/MD            | 依赖本地文件读取；可选 RAG             | `./研究构想/<材料名称>/`     |
 | `marp-slides-creator/`          | 0.1.0 | Marp Slides/PPT 制作：内容消化→出稿→审阅→导出（HTML/PDF） | 论文/笔记/大纲/Markdown         | 需要 Node.js（用于 `npx @marp-team/marp-cli`） | `slides_<项目名>/05_final/` |
-| `ragflow-client/`               | 1.0.0 | RAGflow 知识库问答：走 OpenAI 兼容 API，可返回引用来源    | 问题文本                        | 需要 RAGflow（API Key + Chat ID + Host） | 对话输出（可含引用来源）     |
+| `ragflow-client/`               | 2.0.0 | RAGflow 知识库问答：走 OpenAI 兼容 API，可返回引用来源    | 问题文本                        | 需要 RAGflow（API Key + Chat ID + Host） | 对话输出（可含引用来源）     |
 
 ---
 
