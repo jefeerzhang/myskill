@@ -7,7 +7,12 @@
       "Bash(claude update:*)",
       "Bash(cp:*)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3001/api/v1/health)",
-      "Bash(curl -s -w n%{http_code} http://localhost:3001/)"
+      "Bash(curl -s -w n%{http_code} http://localhost:3001/)",
+      "Bash(python *)",
+      "Bash(chcp 65001 *)",
+      "Bash(PYTHONIOENCODING=utf-8 python *)",
+      "WebSearch",
+      "Skill(peer-review)"
     ]
   }
 }
