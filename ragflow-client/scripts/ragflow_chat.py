@@ -13,6 +13,10 @@ import os
 import argparse
 from pathlib import Path
 
+if sys.platform == 'win32':
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8')
+
 
 class RAGflowClient:
     """RAGflow API 客户端 - 使用原生对话 API，完全继承 Chat 配置"""
@@ -104,6 +108,14 @@ class RAGflowClient:
             "error": resp.get("message", "Unknown error"),
             "code": resp.get("code", -1)
         }
+
+    def list_sessions(self) -> list:
+        """列出当前 chat 的所有会话"""
+        path = f"/api/v1/chats/{self.chat_id}/sessions"
+        resp = self._request("GET", path)
+        if resp.get("code") != 0:
+            return []
+        return resp.get("data", [])
 
 
 def load_config_from_file(config_path: str = None) -> dict:
@@ -206,6 +218,7 @@ def main():
     parser.add_argument('--session-id', help='复用已有会话 ID')
     parser.add_argument('--openai', action='store_true', help='使用 OpenAI 兼容 API')
     parser.add_argument('--init-config', action='store_true', help='生成配置文件模板')
+    parser.add_argument('--list-sessions', action='store_true', help='列出当前 chat 的所有会话')
 
     args = parser.parse_args()
 
@@ -223,6 +236,27 @@ def main():
             json.dump(template, f, indent=2, ensure_ascii=False)
         print(f"配置文件模板已生成: {config_path}")
         print("请编辑该文件填入真实信息后使用。")
+        sys.exit(0)
+
+    if args.list_sessions:
+        config = get_config(args)
+        if not validate_config(config):
+            sys.exit(1)
+        client = RAGflowClient(
+            api_key=config['api_key'],
+            chat_id=config['chat_id'],
+            host=config['host'],
+            port=config.get('port', 80)
+        )
+        sessions = client.list_sessions()
+        if not sessions:
+            print("暂无会话记录")
+        else:
+            print(f"共 {len(sessions)} 个会话:\n")
+            for s in sessions:
+                sid = s.get('id', 'N/A')
+                name = s.get('name', '未命名')
+                print(f"  ID: {sid}  |  名称: {name}")
         sys.exit(0)
 
     config = get_config(args)
