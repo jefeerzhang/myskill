@@ -19,6 +19,7 @@
 | `material-ideation/`            |     — | 材料/文件夹 → 研究问题 + 假设 + 识别策略                                   | 文件夹、PDF/Word/MD             | 依赖本地文件读取；可选 RAG                    | `./研究构想/<材料名称>/`      |
 | `marp-slides-creator/`          | 0.1.0 | Marp Slides 一条龙：内容消化→出稿→审阅→导出（HTML/PDF），含主题选择与适配 | 论文/笔记/大纲/Markdown         | 需要 Node.js（`npx @marp-team/marp-cli`）     | `slides_<项目名>/05_final/`   |
 | `ragflow-client/`               | 2.0.0 | RAGflow 知识库问答：走 OpenAI 兼容 API，可返回引用来源                     | 问题文本                        | 需要 RAGflow（Host + API Key + Chat ID）      | 对话输出（可含引用来源）      |
+| `coefplot/`                     | 0.1.0 | Stata `coefplot` 回归系数作图：多模型/子图/bycoefs/margins/排序/样式等     | Stata 回归输出、需求描述        | 需要 Stata + `ssc install coefplot`          | Stata 命令与可运行示例        |
 
 ---
 
@@ -63,18 +64,18 @@ flowchart TD
 - OpenClaw / LobsterAI：拷贝到 `SKILLs/` 目录即可加载
 - QwenPaw/CoPaw：拷贝到 `~/.copaw/skills/`（或 Windows 的 `%USERPROFILE%\.copaw\skills\`）并在控制台启用
 
-### 1) 安装 OpenClaw / LobsterAI（4 个）
+### 1) 安装 OpenClaw / LobsterAI（5 个）
 
 macOS / Linux：
 
 ```bash
-cp -r academic-literature-guide-v2 material-ideation proposal-review-expert marp-slides-creator ~/Library/Application\ Support/LobsterAI/SKILLs/
+cp -r academic-literature-guide-v2 material-ideation proposal-review-expert marp-slides-creator coefplot ~/Library/Application\ Support/LobsterAI/SKILLs/
 ```
 
 Windows（PowerShell）：
 
 ```powershell
-Copy-Item -Path "academic-literature-guide-v2","material-ideation","proposal-review-expert","marp-slides-creator" -Destination "$env:APPDATA\LobsterAI\SKILLs\" -Recurse
+Copy-Item -Path "academic-literature-guide-v2","material-ideation","proposal-review-expert","marp-slides-creator","coefplot" -Destination "$env:APPDATA\LobsterAI\SKILLs\" -Recurse
 ```
 
 ### 2) 安装 QwenPaw/CoPaw（同行评议 + 社科基金写作 + RAGflow）
@@ -111,6 +112,10 @@ Copy-Item -Path "peer-review","社科基金题目评审","社科基金选题说�
 
 ```
 制作slides
+```
+
+```
+coefplot
 ```
 
 在 QwenPaw/CoPaw（Console 或已连接的 Channel）中发送：
@@ -180,6 +185,12 @@ ragflow-client
 用 ragflow 知识库回答，并给出引用来源：...
 ```
 
+### 5) Stata 回归系数作图（`coefplot`）
+
+```
+我在 Stata 里有多个回归模型（m1 m2 m3），请用 coefplot 画“多模型对比”的回归系数图（drop 常数项、加 0 参考线、按系数分组并美化标签）。同时给出可直接运行的 Stata 代码。
+```
+
 ---
 
 ## 📦 仓库结构
@@ -192,6 +203,7 @@ myskill/
 ├── peer-review/
 ├── proposal-review-expert/
 ├── ragflow-client/
+├── coefplot/
 ├── 社科基金题目评审/
 ├── 社科基金选题说明撰写指南/
 ├── 安装指南.md
@@ -215,6 +227,8 @@ myskill/
 | [marp-slides-creator/SKILL.md](./marp-slides-creator/SKILL.md)                     | Marp Slides：完整工作流          |
 | [themes/README.md](./marp-slides-creator/themes/README.md)                          | Marp Slides：内置主题清单        |
 | [ragflow-client/SKILL.md](./ragflow-client/SKILL.md)                               | RAGflow Client：配置与用法        |
+| [coefplot/SKILL.md](./coefplot/SKILL.md)                                           | Stata coefplot：完整用法与示例   |
+| [coefplot/docs/demo.md](./coefplot/docs/demo.md)                                   | Stata coefplot：场景化示例与配图 |
 | [社科基金题目评审/SKILL.md](./社科基金题目评审/SKILL.md)                             | 社科基金题目评审：规则与评审框架 |
 | [社科基金选题说明撰写指南/SKILL.md](./社科基金选题说明撰写指南/SKILL.md)             | 社科基金选题说明：三层结构与范式 |
 
