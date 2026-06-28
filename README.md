@@ -1,6 +1,6 @@
 # 科研技能包合集（OpenClaw / LobsterAI + QwenPaw/CoPaw）
 
-面向“做科研”的完整工作流技能包：从材料驱动的选题，到文献导读、开题评审、同行评议，再到 Marp 幻灯片产出；同时提供 RAGflow 知识库问答客户端用于资料检索与引用。
+面向“做科研”和“研究写作”的技能包合集：从材料驱动的选题，到文献导读、开题评审、同行评议、经济管理类文献综述，再到 Marp 幻灯片产出；同时提供 RAGflow 知识库问答与公众号长文写作能力。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)](#)
@@ -20,6 +20,8 @@
 | `marp-slides-creator/`          | 0.1.0 | Marp Slides 一条龙：内容消化→出稿→审阅→导出（HTML/PDF），含主题选择与适配 | 论文/笔记/大纲/Markdown         | 需要 Node.js（`npx @marp-team/marp-cli`）     | `slides_<项目名>/05_final/`   |
 | `ragflow-client/`               | 2.0.0 | RAGflow 知识库问答：走 OpenAI 兼容 API，可返回引用来源                     | 问题文本                        | 需要 RAGflow（Host + API Key + Chat ID）      | 对话输出（可含引用来源）      |
 | `coefplot/`                     | 0.1.0 | Stata `coefplot` 回归系数作图：多模型/子图/bycoefs/margins/排序/样式等     | Stata 回归输出、需求描述        | 需要 Stata + `ssc install coefplot`          | Stata 命令与可运行示例        |
+| `econ-literature-review-writer/`| 0.1.0 | 经济管理类文献综述写作：单篇精读或多篇综合，支持 GB/T 7714-2015 参考文献   | 文献、摘要、笔记、参考文献清单  | 适合已给定材料的综述整合                      | 对话输出（综述/矩阵/参考文献） |
+| `khazix-writer/`                | 0.1.0 | 卡兹克风格公众号长文写作：基于素材生成有“活人感”的长文                    | brief、PDF、链接、语音转文字等  | 适合公众号长文，不用于短内容                  | 对话输出（公众号长文草稿）    |
 
 ---
 
@@ -78,20 +80,20 @@ Windows（PowerShell）：
 Copy-Item -Path "academic-literature-guide-v2","material-ideation","proposal-review-expert","marp-slides-creator","coefplot" -Destination "$env:APPDATA\LobsterAI\SKILLs\" -Recurse
 ```
 
-### 2) 安装 QwenPaw/CoPaw（同行评议 + 社科基金写作 + RAGflow）
+### 2) 安装 QwenPaw/CoPaw（同行评议 + 社科基金写作 + RAGflow + 长文写作）
 
 macOS / Linux（默认工作目录 `~/.copaw/`）：
 
 ```bash
 mkdir -p ~/.copaw/skills
-cp -r peer-review 社科基金题目评审 社科基金选题说明撰写指南 ragflow-client ~/.copaw/skills/
+cp -r peer-review 社科基金题目评审 社科基金选题说明撰写指南 ragflow-client econ-literature-review-writer khazix-writer ~/.copaw/skills/
 ```
 
 Windows（PowerShell，默认工作目录 `%USERPROFILE%\.copaw\`）：
 
 ```powershell
 New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.copaw\skills" | Out-Null
-Copy-Item -Path "peer-review","社科基金题目评审","社科基金选题说明撰写指南","ragflow-client" -Destination "$env:USERPROFILE\.copaw\skills\" -Recurse
+Copy-Item -Path "peer-review","社科基金题目评审","社科基金选题说明撰写指南","ragflow-client","econ-literature-review-writer","khazix-writer" -Destination "$env:USERPROFILE\.copaw\skills\" -Recurse
 ```
 
 ### 3) 快速验证
@@ -134,6 +136,14 @@ coefplot
 
 ```
 ragflow-client
+```
+
+```
+文献综述
+```
+
+```
+帮我写一篇公众号长文
 ```
 
 ---
@@ -191,6 +201,19 @@ ragflow-client
 我在 Stata 里有多个回归模型（m1 m2 m3），请用 coefplot 画“多模型对比”的回归系数图（drop 常数项、加 0 参考线、按系数分组并美化标签）。同时给出可直接运行的 Stata 代码。
 ```
 
+### 6) 经济管理类文献综述（`econ-literature-review-writer`）
+
+```
+我这里有 8 篇关于数字经济与企业创新的文献摘要，请帮我整理成一篇经济管理类文献综述，先给文献矩阵，再按主题综合，并按 GB/T 7714-2015 整理参考文献。
+```
+
+### 7) 卡兹克风格公众号长文（`khazix-writer`）
+
+```
+根据下面这些素材，写一篇卡兹克风格的公众号长文。保留我的核心观点和案例，风格要像“有见识的普通人在认真聊一件打动他的事”：
+...
+```
+
 ---
 
 ## 📦 仓库结构
@@ -204,6 +227,8 @@ myskill/
 ├── proposal-review-expert/
 ├── ragflow-client/
 ├── coefplot/
+├── econ-literature-review-writer/
+├── khazix-writer/
 ├── 社科基金题目评审/
 ├── 社科基金选题说明撰写指南/
 ├── 安装指南.md
@@ -229,6 +254,9 @@ myskill/
 | [ragflow-client/SKILL.md](./ragflow-client/SKILL.md)                               | RAGflow Client：配置与用法        |
 | [coefplot/SKILL.md](./coefplot/SKILL.md)                                           | Stata coefplot：完整用法与示例   |
 | [coefplot/docs/demo.md](./coefplot/docs/demo.md)                                   | Stata coefplot：场景化示例与配图 |
+| [econ-literature-review-writer/SKILL.md](./econ-literature-review-writer/SKILL.md) | 经济管理类文献综述：技能说明     |
+| [econ-literature-review-writer/README.md](./econ-literature-review-writer/README.md) | 经济管理类文献综述：完整文档   |
+| [khazix-writer/SKILL.md](./khazix-writer/SKILL.md)                                 | 卡兹克公众号长文：技能说明       |
 | [社科基金题目评审/SKILL.md](./社科基金题目评审/SKILL.md)                             | 社科基金题目评审：规则与评审框架 |
 | [社科基金选题说明撰写指南/SKILL.md](./社科基金选题说明撰写指南/SKILL.md)             | 社科基金选题说明：三层结构与范式 |
 
