@@ -25,7 +25,7 @@
 | `口播视频制作/` | 多媒体 | 文章 / 口播稿转配音动画视频 | 文稿、音色要求、输出目录 | HyperFrames、FFmpeg、MiMo TTS |
 | `khazix-writer/` | 写作 | 基于素材生成公众号长文 | brief、链接、PDF、录音转文字 | 无强制外部依赖 |
 | `avoid-ai-writing/` | 写作 | 英文或通用文本去 AI 味，支持审计和改写 | 文本、文件 | 无强制外部依赖 |
-| `stop-ai-slop-zh/` | 写作 | 中文文本去 AI 味，清理套话、排比和八股 | 中文文案、邮件、摘要、长文 | 无强制外部依赖 |
+| `stop-ai-slop-zh/` | 写作 | 中文文本去 AI 味，清理套话、排比和八股。**已定制版**：合法序号（第一/第二/第三）保留，新增防口水话检查，六维量规评分 ≥35 | 中文文案、邮件、摘要、长文 | 无强制外部依赖 |
 | `grill-me/` | 方案评审 | 围绕 plan / design 持续追问，直到对齐 | 计划、设计稿、需求 | 无强制外部依赖 |
 | `grill-with-docs/` | 方案评审 | 结合项目文档和术语体系拷打方案，并同步文档 | 方案、项目文档、术语约定 | 依赖项目上下文 |
 | `mattpocock-grilling/` | 方案评审 | 高强度追问式设计审查 | 计划、设计稿 | 无强制外部依赖 |
@@ -47,7 +47,7 @@
 ### 2. 改写文本 / 去 AI 味
 
 - 英文或通用文本：`avoid-ai-writing`
-- 中文文本：`stop-ai-slop-zh`
+- 中文文本：`stop-ai-slop-zh`（**已定制版**——保留序号结构，新增防口水话检查）
 - 公众号长文成稿：`khazix-writer`
 
 ### 3. 拷打计划 / 对齐设计
@@ -193,6 +193,7 @@ myskill/
 
 | 文档 | 说明 |
 | --- | --- |
+| [stop-ai-slop-zh/SKILL.md](./stop-ai-slop-zh/SKILL.md) | 中文去 AI 味定制版（规则6·去AI味≠口水话·六维量规） |
 | [academic-literature-guide-v2/README.md](./academic-literature-guide-v2/README.md) | 文献导读技能说明 |
 | [proposal-review-expert/README.md](./proposal-review-expert/README.md) | 开题报告评审说明 |
 | [peer-review/README.md](./peer-review/README.md) | 同行评议说明 |
