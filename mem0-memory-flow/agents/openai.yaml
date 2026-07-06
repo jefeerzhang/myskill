@@ -1,0 +1,7 @@
+interface:
+  display_name: "Mem0 Memory Flow"
+  short_description: "Mem0 候选记忆审核、人工批准与手动召回工作流"
+  default_prompt: "Use $mem0-memory-flow to review memory candidates and upload only user-approved Mem0 memories."
+policy:
+  allow_implicit_invocation: true
+

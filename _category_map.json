@@ -1,0 +1,34 @@
+{
+  "$schema": "v1",
+  "description": "技能分类映射，用于按类别浏览和安装",
+  "categories": {
+    "学术研究": {
+      "skills": ["academic-literature-guide-v2", "material-ideation"],
+      "icon": "📖"
+    },
+    "学术评审": {
+      "skills": ["proposal-review-expert", "peer-review", "社科基金题目评审"],
+      "icon": "🔍"
+    },
+    "学术写作": {
+      "skills": ["econ-literature-review-writer", "社科基金选题说明撰写指南"],
+      "icon": "✍️"
+    },
+    "写作与去AI味": {
+      "skills": ["khazix-writer", "avoid-ai-writing", "stop-ai-slop-zh"],
+      "icon": "🖋️"
+    },
+    "方案拷打与对齐": {
+      "skills": ["grill-me", "grill-with-docs", "mattpocock-grilling"],
+      "icon": "🔥"
+    },
+    "工具": {
+      "skills": ["ragflow-client", "coefplot", "mem0-memory-flow", "口播视频制作"],
+      "icon": "🔧"
+    },
+    "教学": {
+      "skills": ["teach"],
+      "icon": "🎓"
+    }
+  }
+}
