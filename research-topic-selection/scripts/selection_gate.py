@@ -1,72 +1,68 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""selection_gate.py —— research-topic-selection 刚性推进闸门（v1.1）。
+"""research-topic-selection rigid gate (v1.2).
 
-进入关键 Phase（含断点续写跳入）前必须过本闸：校验全部前置必要产物存在、非空、
-schema 合法、审查 verdict 为 PASS 且经 hash 绑定（防重放 / 审后改 / 跨目录搬运）。
-
-用法：
-    python3 scripts/selection_gate.py --workdir DIR --enter {2,4,5,7,final} [--json]
-
-退出码：
-    0 = PASS（允许进入该 Phase）
-    1 = FAIL（打印缺失 / 失配清单，拒绝进入）
-    2 = 用法 / IO / JSON 错误
-    3 = 回环越界（某审查节点 round > 3）—— 升级人类裁决，不许再自动重试
-
-设计原则：
-- 审查 verdict（review/review_<node>.json）必须绑定被审 artifact 的 sha256、
-  匹配当前 workdir 与 node、与 transcript 中 fenced JSON 一致。
-- reviewer 档位：选题技能 critical 节点（scan / topics）一律 independent；
-  其余 subagent 即可。
-- 信任边界（如实声明）：本脚本只校验字段与 hash 绑定，不提供密码学身份保证；
-  蓄意编排者仍可整体伪造自洽 transcript+verdict（v1.1 级残留）。
+The gate validates phase deliverables and the two independent review nodes
+(`scan` and `topics`). It is intentionally stricter than a simple file-exists
+check: review verdicts must be tied to the current workdir, current artifacts,
+the transcript hash, and closed P0 dispositions.
 """
+
+from __future__ import annotations
+
 import argparse
 import hashlib
 import json
 import os
 import re
 import sys
+from typing import Any
 
-PHASES = ["2", "4", "5", "7", "final"]
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8")
 
-# deliverable_type -> (expected_stakes, min_topics)
-DELIVERABLE_MAP = {
-    "期刊论文": ("high", 3),
-    "课题申报": ("high", 3),
-    "政策报告": ("standard", 2),
-    "案例研究": ("standard", 2),
-    "快速选题梳理": ("standard", 2),
+
+ENTER_ALIASES = {
+    "2": "scan",
+    "scan": "scan",
+    "4": "scan-review",
+    "scan-review": "scan-review",
+    "5": "literature",
+    "literature": "literature",
+    "7": "topics",
+    "topics": "topics",
+    "final": "final",
 }
 
-# 五维扫描维度（schema 校验用）
-SCAN_DIMS = ["政策扫描", "学术文献扫描", "现实实践扫描", "数据/材料扫描", "发表/申报窗口扫描"]
+SCAN_DIMS = [
+    "政策扫描",
+    "学术文献扫描",
+    "现实实践扫描",
+    "数据/材料扫描",
+    "发表/申报窗口扫描",
+]
 
-# node -> 必须绑定的 artifact 相对路径（verdict.artifact_hashes 必须含且 hash 一致）
 REVIEW_BINDINGS = {
     "scan": ["03_五维扫描.md", "04_问题域地图.md"],
     "topics": ["07_核心缺口.md", "08_选题推荐.md"],
 }
 
-# critical 节点一律走 independent 审查（选题仅 scan / topics 两道硬闸）
 ALWAYS_INDEPENDENT = {"scan", "topics"}
-
 DISPOSITION_STATUSES = {"已修正", "反驳成立", "不适用"}
 MAX_REVIEW_ROUNDS = 3
 
-SAFE_SLUG = re.compile(r"^[A-Za-z0-9_-]+$")
-
 
 class GateFail(Exception):
-    pass
+    """Expected validation failure."""
 
 
 class LoopExceeded(Exception):
-    pass
+    """Review loop exceeded the configured maximum."""
 
 
-def sha256_of(path):
+def sha256_of(path: str) -> str:
     h = hashlib.sha256()
     with open(path, "rb") as f:
         for chunk in iter(lambda: f.read(65536), b""):
@@ -74,119 +70,337 @@ def sha256_of(path):
     return h.hexdigest()
 
 
-def load_json(path):
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
+def normpath(path: str) -> str:
+    return os.path.normcase(os.path.abspath(os.path.normpath(path)))
 
 
-def require_file(workdir, rel, must_nonempty=True):
-    p = os.path.join(workdir, rel)
-    if not os.path.isfile(p):
+def read_text(workdir: str, rel: str) -> str:
+    path = os.path.join(workdir, rel)
+    if not os.path.isfile(path):
         raise GateFail(f"缺失文件: {rel}")
-    if must_nonempty and os.path.getsize(p) == 0:
-        raise GateFail(f"空文件: {rel}")
+    with open(path, "r", encoding="utf-8-sig", errors="ignore") as f:
+        return f.read()
 
 
-def require_heading(workdir, rel, marker):
-    """校验产物 md 含某关键字（避免只有标题无内容）。文件缺失仍归为 GateFail（缺文件）。"""
-    p = os.path.join(workdir, rel)
-    if not os.path.isfile(p):
-        raise GateFail(f"缺失文件: {rel}")
-    with open(p, "r", encoding="utf-8", errors="ignore") as f:
-        txt = f.read()
-    if marker not in txt:
+def load_json(path: str) -> dict[str, Any]:
+    with open(path, "r", encoding="utf-8-sig") as f:
+        data = json.load(f)
+    if not isinstance(data, dict):
+        raise GateFail(f"JSON 根对象必须是 object: {path}")
+    return data
+
+
+def require_file(workdir: str, rel: str, min_chars: int = 1) -> str:
+    txt = read_text(workdir, rel)
+    if len(txt.strip()) < min_chars:
+        raise GateFail(f"{rel} 内容过少，至少需要 {min_chars} 个字符")
+    return txt
+
+
+def require_markers(workdir: str, rel: str, markers: list[str]) -> str:
+    txt = require_file(workdir, rel)
+    missing = [marker for marker in markers if marker not in txt]
+    if missing:
+        raise GateFail(f"{rel} 缺少必需段落/关键词: {', '.join(missing)}")
+    return txt
+
+
+def require_section_after_marker(txt: str, rel: str, marker: str, min_chars: int = 20) -> None:
+    idx = txt.find(marker)
+    if idx < 0:
         raise GateFail(f"{rel} 缺少必需段落: {marker}")
+    tail = txt[idx + len(marker) :].strip()
+    if len(tail) < min_chars:
+        raise GateFail(f"{rel} 的「{marker}」段内容过少")
 
 
-def verify_review(workdir, node):
-    """校验 review/review_<node>.json：verdict=PASS、hash 绑定、reviewer≠producer、回合≤3。"""
-    rv_path = os.path.join(workdir, "review", f"review_{node}.json")
+def count_marked_headings(txt: str, marker: str) -> int:
+    pattern = re.compile(rf"(?m)^#{{1,6}}\s*{re.escape(marker)}(?:\s*\d+)?(?:\s*[:：].*)?\s*$")
+    return len(pattern.findall(txt))
+
+
+def extract_last_fenced_json(txt: str) -> dict[str, Any] | None:
+    blocks = re.findall(r"```(?:json)?\s*(\{.*?\})\s*```", txt, flags=re.S | re.I)
+    for block in reversed(blocks):
+        try:
+            parsed = json.loads(block)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(parsed, dict):
+            return parsed
+    return None
+
+
+def review_had_p0(rv: dict[str, Any]) -> bool:
+    if rv.get("p0"):
+        return True
+    history = rv.get("history", [])
+    if not isinstance(history, list):
+        raise GateFail("review.history 必须是数组")
+    for item in history:
+        if not isinstance(item, dict):
+            raise GateFail("review.history 内部元素必须是 object")
+        try:
+            if int(item.get("p0_found", 0)) > 0 or int(item.get("p0_open", 0)) > 0:
+                return True
+        except (TypeError, ValueError):
+            raise GateFail("review.history 的 p0_found/p0_open 必须是整数")
+    return False
+
+
+def expected_p0_ids(rv: dict[str, Any]) -> set[str]:
+    ids: set[str] = set()
+    for item in rv.get("history", []):
+        for p0_id in item.get("p0_ids", []) or []:
+            ids.add(str(p0_id))
+    for item in rv.get("p0", []) or []:
+        if isinstance(item, dict) and item.get("id"):
+            ids.add(str(item["id"]))
+    return ids
+
+
+def verify_dispositions(workdir: str, node: str, rv: dict[str, Any]) -> None:
+    if not review_had_p0(rv):
+        return
+    disp_rel = os.path.join("review", f"dispositions_{node}.json")
+    disp_path = os.path.join(workdir, disp_rel)
+    if not os.path.isfile(disp_path):
+        raise GateFail(f"审查节点 {node} 曾出现 P0，但缺失处置闭环: {disp_rel}")
+    disp = load_json(disp_path)
+    findings = disp.get("findings")
+    if not isinstance(findings, list) or not findings:
+        raise GateFail(f"{disp_rel} 必须包含非空 findings 数组")
+
+    seen: set[str] = set()
+    for item in findings:
+        if not isinstance(item, dict):
+            raise GateFail(f"{disp_rel}.findings 内部元素必须是 object")
+        fid = str(item.get("id", "")).strip()
+        status = item.get("status")
+        decision = item.get("reviewer_decision")
+        if not fid:
+            raise GateFail(f"{disp_rel} 存在缺少 id 的处置项")
+        seen.add(fid)
+        if status not in DISPOSITION_STATUSES:
+            raise GateFail(f"{disp_rel} 的 {fid} status 非法: {status}")
+        if decision != "accepted":
+            raise GateFail(f"{disp_rel} 的 {fid} 尚未被原审查者 accepted")
+        if not str(item.get("evidence", "")).strip():
+            raise GateFail(f"{disp_rel} 的 {fid} 缺少 evidence")
+
+    missing = expected_p0_ids(rv) - seen
+    if missing:
+        raise GateFail(f"{disp_rel} 未覆盖历史 P0: {', '.join(sorted(missing))}")
+    if rv.get("re_reviewed_dispositions") is not True:
+        raise GateFail(f"审查节点 {node} 出现过 P0，review.re_reviewed_dispositions 必须为 true")
+
+
+def verify_review(workdir: str, node: str) -> dict[str, Any]:
+    rv_rel = os.path.join("review", f"review_{node}.json")
+    rv_path = os.path.join(workdir, rv_rel)
     if not os.path.isfile(rv_path):
-        raise GateFail(f"缺失审查 verdict: review/review_{node}.json")
+        raise GateFail(f"缺失审查 verdict: {rv_rel}")
     rv = load_json(rv_path)
+
+    if rv.get("node") != node:
+        raise GateFail(f"{rv_rel} node={rv.get('node')}，期望 {node}")
+    if rv.get("workdir") is None:
+        raise GateFail(f"{rv_rel} 缺少 workdir")
+    if normpath(str(rv["workdir"])) != normpath(workdir):
+        raise GateFail(f"{rv_rel} workdir 与当前目录不一致")
+    if node in ALWAYS_INDEPENDENT and rv.get("reviewer_kind") != "independent":
+        raise GateFail(f"审查节点 {node} 必须 reviewer_kind=independent")
     if rv.get("verdict") != "PASS":
         raise GateFail(f"审查节点 {node} verdict={rv.get('verdict')}，未 PASS")
-    if rv.get("round", 1) > MAX_REVIEW_ROUNDS:
-        raise LoopExceeded(f"审查节点 {node} round={rv.get('round')} 超界 >3")
+
+    try:
+        round_no = int(rv.get("round"))
+    except (TypeError, ValueError):
+        raise GateFail(f"{rv_rel} round 必须是整数")
+    if round_no < 1:
+        raise GateFail(f"{rv_rel} round 必须 >= 1")
+    if round_no > MAX_REVIEW_ROUNDS:
+        raise LoopExceeded(f"审查节点 {node} round={round_no} 超界 > {MAX_REVIEW_ROUNDS}")
+
+    try:
+        p0_open = int(rv.get("p0_open"))
+    except (TypeError, ValueError):
+        raise GateFail(f"{rv_rel} p0_open 必须是整数")
+    if p0_open != 0:
+        raise GateFail(f"审查节点 {node} p0_open={p0_open}，未闭合")
+    if rv.get("p0"):
+        raise GateFail(f"审查节点 {node} 当前 verdict 仍含 P0 列表，未闭合")
+
     reviewer = rv.get("reviewer_agent_id")
     producer = rv.get("producer_agent_id")
     if not reviewer or not producer or reviewer == producer:
         raise GateFail(f"审查节点 {node} reviewer/producer 缺失或相等（自审违规）")
-    # hash 绑定校验
-    bindings = REVIEW_BINDINGS.get(node, [])
-    artifact_hashes = rv.get("artifact_hashes", {})
-    for art in bindings:
+
+    artifact_hashes = rv.get("artifact_hashes")
+    if not isinstance(artifact_hashes, dict):
+        raise GateFail(f"{rv_rel} artifact_hashes 必须是 object")
+    for art in REVIEW_BINDINGS.get(node, []):
         ap = os.path.join(workdir, art)
         if not os.path.isfile(ap):
             raise GateFail(f"审查绑定产物缺失: {art}（node={node}）")
         if art not in artifact_hashes:
             raise GateFail(f"verdict 未绑定: {art}（node={node}）")
-        if artifact_hashes[art] != sha256_of(ap):
+        actual = sha256_of(ap)
+        if artifact_hashes[art] != actual:
             raise GateFail(f"hash 失配: {art}（node={node}，产物已变更，旧 verdict 失效）")
+
+    transcript_rel = rv.get("transcript_path") or os.path.join("review", "transcripts", f"{node}_r{round_no}.md")
+    transcript_path = (
+        str(transcript_rel)
+        if os.path.isabs(str(transcript_rel))
+        else os.path.join(workdir, str(transcript_rel))
+    )
+    if not os.path.isfile(transcript_path):
+        raise GateFail(f"缺失审查 transcript: {transcript_rel}")
+    agent_output_sha256 = rv.get("agent_output_sha256")
+    if not agent_output_sha256:
+        raise GateFail(f"{rv_rel} 缺少 agent_output_sha256")
+    if agent_output_sha256 != sha256_of(transcript_path):
+        raise GateFail(f"审查 transcript hash 失配: {transcript_rel}")
+
+    with open(transcript_path, "r", encoding="utf-8-sig", errors="ignore") as f:
+        transcript_txt = f.read()
+    transcript_json = extract_last_fenced_json(transcript_txt)
+    if transcript_json is None:
+        raise GateFail(f"{transcript_rel} 未找到 fenced JSON verdict")
+    rv_without_append = {k: v for k, v in rv.items() if k not in {"agent_output_sha256", "transcript_path"}}
+    for key, value in transcript_json.items():
+        if rv_without_append.get(key) != value:
+            raise GateFail(f"{rv_rel} 与 transcript fenced JSON 字段不一致: {key}")
+
+    verify_dispositions(workdir, node, rv)
     return rv
 
 
-def check_enter(workdir, phase):
-    # Phase 1（三问与澄清）为起点，无需前置闸；以下为关键 BLOCKING 点
-    if phase == "2":
-        # 进入「初步问题域假设」需三问与澄清非空
-        require_heading(workdir, "01_三问与澄清.md", "关心的问题")
+def check_scan(workdir: str) -> None:
+    txt = require_markers(workdir, "03_五维扫描.md", SCAN_DIMS + ["反确认偏差记录"])
+    for marker in SCAN_DIMS:
+        require_section_after_marker(txt, "03_五维扫描.md", marker, min_chars=20)
+    require_section_after_marker(txt, "03_五维扫描.md", "反确认偏差记录", min_chars=40)
+
+
+def check_map(workdir: str) -> None:
+    require_markers(
+        workdir,
+        "04_问题域地图.md",
+        ["核心现实问题", "主要学术分支", "政策/实践变化", "可用数据", "潜在研究切口", "初步风险判断"],
+    )
+    require_file(workdir, "04_问题域地图.md", min_chars=300)
+
+
+def check_literature(workdir: str) -> None:
+    require_markers(workdir, "05_文献脉络.md", ["前沿方向", "核心争论", "方法谱系"])
+    require_file(workdir, "05_文献脉络.md", min_chars=200)
+
+
+def check_gap(workdir: str) -> None:
+    require_markers(workdir, "07_核心缺口.md", ["核心缺口", "既有研究已解释", "仍不足", "为何重要"])
+    require_file(workdir, "07_核心缺口.md", min_chars=200)
+
+
+def check_topics(workdir: str) -> None:
+    txt = require_markers(
+        workdir,
+        "08_选题推荐.md",
+        ["主推选题", "备选选题", "推荐判断", "最推荐推进", "主要风险", "下一步"],
+    )
+    if count_marked_headings(txt, "主推选题") < 3:
+        raise GateFail("08_选题推荐.md 至少需要 3 个「主推选题」标题")
+    if count_marked_headings(txt, "备选选题") < 2:
+        raise GateFail("08_选题推荐.md 至少需要 2 个「备选选题」标题")
+    require_file(workdir, "08_选题推荐.md", min_chars=350)
+
+
+def check_enter(workdir: str, enter: str) -> None:
+    target = ENTER_ALIASES.get(enter)
+    if target is None:
+        raise GateFail(f"未知 enter 目标: {enter}")
+
+    if target == "scan":
+        check_scan(workdir)
         return
-    if phase == "4":
-        # 进入「问题域地图」需五维扫描已完成且 scan 审查 PASS
-        require_file(workdir, "03_五维扫描.md")
-        for d in SCAN_DIMS:
-            require_heading(workdir, "03_五维扫描.md", d)
+    if target == "scan-review":
+        check_scan(workdir)
+        check_map(workdir)
         verify_review(workdir, "scan")
         return
-    if phase == "5":
-        # 进入「中等深度文献脉络」需问题域地图非空
-        require_file(workdir, "04_问题域地图.md")
+    if target == "literature":
+        check_literature(workdir)
         return
-    if phase == "7":
-        # 进入「核心缺口 + 选题推荐」需文献脉络非空 + topics 审查 PASS（基于地图+脉络）
-        require_file(workdir, "05_文献脉络.md")
+    if target == "topics":
+        check_gap(workdir)
+        check_topics(workdir)
         verify_review(workdir, "topics")
         return
-    if phase == "final":
-        # 交付前：缺口 1-3 个 + 3+2 推荐齐全 + 信任边界声明
-        require_heading(workdir, "07_核心缺口.md", "核心缺口")
-        require_heading(workdir, "08_选题推荐.md", "主推选题")
-        require_heading(workdir, "08_选题推荐.md", "备选选题")
+    if target == "final":
+        check_gap(workdir)
+        check_topics(workdir)
+        verify_review(workdir, "topics")
         return
-    raise GateFail(f"未知 enter 目标: {phase}")
 
 
-def main():
+def artifact_hash_template(workdir: str, node: str) -> dict[str, Any]:
+    if node not in REVIEW_BINDINGS:
+        raise GateFail(f"未知 review node: {node}")
+    return {
+        "node": node,
+        "workdir": normpath(workdir),
+        "artifact_hashes": {
+            rel: sha256_of(os.path.join(workdir, rel))
+            for rel in REVIEW_BINDINGS[node]
+            if os.path.isfile(os.path.join(workdir, rel))
+        },
+    }
+
+
+def main() -> int:
     ap = argparse.ArgumentParser(description="research-topic-selection 刚性闸门")
     ap.add_argument("--workdir", required=True)
-    ap.add_argument("--enter", required=True, choices=PHASES)
+    ap.add_argument("--enter", choices=sorted(ENTER_ALIASES.keys()))
+    ap.add_argument("--hash-template", choices=sorted(REVIEW_BINDINGS.keys()))
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args()
 
     workdir = os.path.abspath(args.workdir)
     if not os.path.isdir(workdir):
-        print(json.dumps({"ok": False, "error": f"workdir 不存在: {workdir}"}) if args.json
-              else f"FAIL: workdir 不存在: {workdir}")
+        message = f"workdir 不存在: {workdir}"
+        print(json.dumps({"ok": False, "error": message}, ensure_ascii=False) if args.json else f"FAIL: {message}")
         return 2
 
     try:
+        if args.hash_template:
+            result = artifact_hash_template(workdir, args.hash_template)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 0
+        if not args.enter:
+            raise GateFail("必须提供 --enter，或使用 --hash-template 生成审查 hash 模板")
         check_enter(workdir, args.enter)
     except LoopExceeded as e:
-        msg = f"LOOP_EXCEEDED: {e}"
-        print(json.dumps({"ok": False, "loop_exceeded": True, "error": str(e)}) if args.json else msg)
+        print(
+            json.dumps({"ok": False, "loop_exceeded": True, "error": str(e)}, ensure_ascii=False)
+            if args.json
+            else f"LOOP_EXCEEDED: {e}"
+        )
         return 3
     except GateFail as e:
-        msg = f"FAIL: {e}"
-        print(json.dumps({"ok": False, "error": str(e)}) if args.json else msg)
+        print(json.dumps({"ok": False, "error": str(e)}, ensure_ascii=False) if args.json else f"FAIL: {e}")
         return 1
-    except Exception as e:  # noqa
-        msg = f"ERROR: {type(e).__name__}: {e}"
-        print(json.dumps({"ok": False, "error": msg}) if args.json else msg)
+    except Exception as e:  # noqa: BLE001
+        message = f"{type(e).__name__}: {e}"
+        print(json.dumps({"ok": False, "error": message}, ensure_ascii=False) if args.json else f"ERROR: {message}")
         return 2
 
-    print(json.dumps({"ok": True, "enter": args.enter}) if args.json
-          else f"PASS: 允许进入 Phase {args.enter}")
+    normalized = ENTER_ALIASES[args.enter]
+    print(
+        json.dumps({"ok": True, "enter": args.enter, "target": normalized}, ensure_ascii=False)
+        if args.json
+        else f"PASS: 允许进入 {normalized}"
+    )
     return 0
 
 

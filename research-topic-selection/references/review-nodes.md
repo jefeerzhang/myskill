@@ -1,4 +1,4 @@
-# 选题审查节点规则（v1.1）
+# 选题审查节点规则（v1.2）
 
 > **加载时机**：执行 scan / topics 任一审查节点前。
 > **审查分离原则**：选题技能只有两道 critical 闸（scan、topics），均强制 independent 审查；
@@ -14,6 +14,8 @@
 - **审查者永远 ≠ 产出者**：independent 档指在本地 GenericAgent 下用**独立上下文 / 独立模型调用**执行审查，
   其上下文不含产出过程（不读主线程中间草稿，只读落盘产物）。
 - `reviewer_agent_id` / `producer_agent_id` 必须如实填写且不相等（selection_gate 字段级校验）。
+- `node`、`workdir`、`reviewer_kind`、`p0_open`、`round`、`artifact_hashes`、
+  `agent_output_sha256` 均为硬性字段；缺失即闸门 FAIL。
 - 不依赖 codex-verify 等外部受控 runner；本地可用 subagent 机制或另起会话承担 independent 审查。
 
 ## 二、审查者输出（verdict JSON 模板）
@@ -22,6 +24,9 @@
 - 完整原始输出 → `review/transcripts/<node>_r<round>.md`
 - fenced JSON 块 → `review/review_<node>.json`，仅允许主线程落盘时追加一个字段
   `agent_output_sha256`（= transcript 文件的 sha256）。
+
+若保存 transcript 的位置不是默认路径，`review/review_<node>.json` 可额外追加
+`transcript_path` 字段。除此之外，不得改写审查者 fenced JSON 的原始字段。
 
 ```json
 {
@@ -48,12 +53,17 @@
 ```
 
 要点：
+- `node` 必须等于当前节点名；`workdir` 必须等于当前工作目录绝对路径；跨目录复制旧 verdict 会被拒绝。
+- `reviewer_kind` 对 scan/topics 必须为 `independent`；`reviewer_agent_id` 必须不同于 `producer_agent_id`。
+- `verdict` 必须为 `PASS`，`p0_open` 必须为 0，且当前 `p0` 列表必须为空。
 - `artifact_hashes` 由**审查者本人**对它实际读到的产物计算（shell `sha256sum` 或等价），
   逐文件填写——声明"我审的就是这一版"。selection_gate 会与当前文件实算值比对，
   防旧 verdict 重放、防审后再改产物。
 - 各节点绑定文件以 `scripts/selection_gate.py` 的 `REVIEW_BINDINGS` 为准
   （scan → 03_五维扫描.md + 04_问题域地图.md；topics → 07_核心缺口.md + 08_选题推荐.md）。
 - `history` 每轮如实记录；`p0_found > 0` 的轮必须列 `p0_ids`。
+- `agent_output_sha256` 必须等于完整 transcript 文件的 sha256。selection_gate 还会读取 transcript
+  末尾 fenced JSON，与 `review/review_<node>.json` 的原始字段逐项比对。
 
 ## 三、处置闭环（禁自审的核心）
 
@@ -67,6 +77,9 @@
 2. **回送原审查者复核**：审查者逐条裁决 `reviewer_decision: accepted | rejected`，
    写回 `review/dispositions_<node>.json`。rejected 的 P0 必须重新修正并再审。
 3. 回环有界：单节点 round ≤ 3（selection_gate 超界 exit 3，升级人类裁决，不许自动重试）。
+4. 只要 `history` 中任一轮 `p0_found > 0`，最终 verdict 必须设置
+   `re_reviewed_dispositions: true`，且 `review/dispositions_<node>.json` 中每条历史 P0
+   都必须有合法 `status`、非空 `evidence`、`reviewer_decision: accepted`。
 
 ## 四、审查关注点清单（选题专用）
 
@@ -82,8 +95,19 @@
 - 判断是否自洽：优先/可以/谨慎/暂缓的分级理由是否一致，最推荐项是否有压倒性依据。
 - 去 AI 味：中文表述是否落入模板腔（参考本地 writing_principles_sop）。
 
-## 五、信任边界（如实声明）
+## 五、hash 模板辅助
 
-本机制只校验字段与 hash 绑定，**不提供密码学身份保证**。蓄意伪造一整套自洽
-transcript + verdict + 匹配 hash 仍是可能的（v1.1 级残留）。
+主线程可以在送审前生成当前 artifact hash 模板，供审查者核对：
+
+```bash
+python scripts/selection_gate.py --workdir <wd> --hash-template scan
+python scripts/selection_gate.py --workdir <wd> --hash-template topics
+```
+
+审查者仍应以自己实际读取到的文件为准填写 hash；模板只用于降低手工出错率。
+
+## 六、信任边界（如实声明）
+
+本机制校验字段、hash 绑定、transcript hash 与 P0 处置闭环，**不提供密码学身份保证**。
+蓄意伪造一整套自洽 transcript + verdict + 匹配 hash 仍是可能的（v1.2 级残留）。
 彻底闭合需受控 runner 外部登记审查行为，超出本技能范围。

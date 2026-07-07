@@ -1,22 +1,22 @@
 ---
 name: research-topic-selection
 description: |
-  AI 辅助科研选题系统 v1.1：从模糊兴趣到
+  AI 辅助科研选题系统 v1.2：从模糊兴趣到
   3+2 可申报课题的全流程构建。集成刚性推进闸门（scripts/selection_gate.py）、
   独立审查分离（references/review-nodes.md）、五维扫描清单（references/scan-checklist.md）、
   学科分支适配（references/discipline-branches.md）。
   适用经济/管理/社科为主的论文选题与课题申报；自然/工程类走"工程应用"分支。
   触发词：科研选题、论文选题、课题申报选题、AI辅助选题、研究缺口、文献脉络、
   学术趋势、课题申报、社科选题、经管选题。
-version: 1.1.0
+version: 1.2.0
 ---
 
-# Research Topic Selection（科研/课题申报选题系统 v1.1）
+# Research Topic Selection（科研/课题申报选题系统 v1.2）
 
 AI 辅助的科研选题流程，**以研究者自身输入为唯一出发点**——不随机生成题目，而是把模糊兴趣收敛成可申报的 3+2 选题。
 
-本技能 v1.1 起引入**刚性推进闸门**与**独立审查分离**：
-进入关键 Phase 前必须过 `scripts/selection_gate.py`；scan / topics 两道 critical 闸强制独立审查，
+本技能 v1.2 使用**刚性推进闸门**与**独立审查分离**：
+关键产物完成后必须过 `scripts/selection_gate.py`；scan / topics 两道 critical 闸强制独立审查，
 处置闭环经原审查者复核，断点续写不可静默绕过上游闸。详见 `references/review-nodes.md`。
 
 ---
@@ -51,7 +51,8 @@ AI 辅助的科研选题流程，**以研究者自身输入为唯一出发点**�
 禁止编造近期性；每维至少 1 条反面/竞争性证据（反确认偏差，清单 §六）。
 落盘：`03_五维扫描.md`（含末尾"反确认偏差记录"段）。
 
-> 进入 Phase 4 前过 `python3 scripts/selection_gate.py --workdir <wd> --enter 2`（校验 03 存在且含反确认偏差段）。
+> 生成 03 后过 `python scripts/selection_gate.py --workdir <wd> --enter scan`
+> （兼容旧命令 `--enter 2`；校验 03 五维齐全且含反确认偏差段）。
 
 ## 四、问题域地图（Phase 3）
 
@@ -67,14 +68,16 @@ AI 辅助的科研选题流程，**以研究者自身输入为唯一出发点**�
 
 > **scan 独立审查（critical，independent）**：过闸后调用独立审查者审 03+04，
 > 输出 verdict JSON（模板见 `references/review-nodes.md`），`p0_open=0` 才放行进入 Phase 5。
-> 前过 `python3 scripts/selection_gate.py --workdir <wd> --enter 4`（校验 scan review 已 PASS 且 hash 绑定）。
+> 前过 `python scripts/selection_gate.py --workdir <wd> --enter scan-review`
+> （兼容旧命令 `--enter 4`；校验 03+04、scan review、hash、transcript 与 P0 闭环）。
 
 ## 五、中等深度文献脉络（Phase 4）
 
 围绕地图中的切口，做中等深度而非穷尽的文献脉络：前沿方向、核心争论、方法谱系。
 落盘：`05_文献脉络.md`。
 
-> 进入 Phase 6 前过 `python3 scripts/selection_gate.py --workdir <wd> --enter 5`（校验 05 非空）。
+> 生成 05 后过 `python scripts/selection_gate.py --workdir <wd> --enter literature`
+> （兼容旧命令 `--enter 5`；校验 05 含前沿方向、核心争论、方法谱系）。
 
 ## 六、总体趋势判断（Phase 5）
 
@@ -98,12 +101,13 @@ AI 辅助的科研选题流程，**以研究者自身输入为唯一出发点**�
 落盘：`08_选题推荐.md`。
 
 > **topics 独立审查（critical，independent）**：调用独立审查者审 07+08，verdict `p0_open=0` 才放行 final。
-> 前过 `python3 scripts/selection_gate.py --workdir <wd> --enter 7`（校验 topics review 已 PASS 且 hash 绑定）。
+> 前过 `python scripts/selection_gate.py --workdir <wd> --enter topics`
+> （兼容旧命令 `--enter 7`；校验 07+08、topics review、hash、transcript 与 P0 闭环）。
 
 ## 九、交付（final，BLOCKING）
 
-> 进入前过 `python3 scripts/selection_gate.py --workdir <wd> --enter final`
-> （校验 07+08 存在、非空、含关键段；可选校验 01/03/04/05/06 存在）。
+> 进入前过 `python scripts/selection_gate.py --workdir <wd> --enter final`
+> （校验 07+08 存在、结构完整，并复核 topics 独立审查仍绑定当前文件版本）。
 
 交付 `08_选题推荐.md` 给用户，并附：
 - 研究主题与范围
@@ -113,20 +117,30 @@ AI 辅助的科研选题流程，**以研究者自身输入为唯一出发点**�
 
 ---
 
-## 十、刚性闸门与审查机制（v1.1 核心，适配选题轻量特性）
+## 十、刚性闸门与审查机制（v1.2 核心，适配选题轻量特性）
 
 ### 10.1 闸门
 
-`python3 scripts/selection_gate.py --workdir <wd> --enter {2,4,5,7,final}`
+`python scripts/selection_gate.py --workdir <wd> --enter {scan,scan-review,literature,topics,final}`
+
+旧数字入口仍可用：`2=scan`，`4=scan-review`，`5=literature`，`7=topics`。
 
 | enter | 校验内容 | 退出码 |
 |-------|----------|--------|
-| 2  | 03_五维扫描.md 存在且含"反确认偏差记录"段 | 0 PASS / 1 FAIL |
-| 4  | 04 存在非空 + scan review verdict=PASS 且 artifact_hashes 匹配 | 同上 |
-| 5  | 05_文献脉络.md 非空 | 同上 |
-| 7  | 08 存在非空 + topics review verdict=PASS 且 artifact_hashes 匹配 | 同上 |
-| final | 07+08 存在非空且含关键段 | 同上 |
+| scan / 2 | 03_五维扫描.md 五维齐全，且含有足量"反确认偏差记录" | 0 PASS / 1 FAIL |
+| scan-review / 4 | 03+04 结构完整 + scan review verdict=PASS + artifact_hashes/transcript/P0 闭环均匹配 | 同上 |
+| literature / 5 | 05_文献脉络.md 含前沿方向、核心争论、方法谱系且内容非空 | 同上 |
+| topics / 7 | 07+08 结构完整 + topics review verdict=PASS + artifact_hashes/transcript/P0 闭环均匹配 | 同上 |
+| final | 07+08 结构完整，并复核 topics review 仍绑定当前文件版本 | 同上 |
 | —  | 单节点审查 round > 3 | 3（超界，升级人类） |
+
+生成审查 hash 模板可用：
+
+`python scripts/selection_gate.py --workdir <wd> --hash-template scan`
+
+或：
+
+`python scripts/selection_gate.py --workdir <wd> --hash-template topics`
 
 ### 10.2 审查分离（强制）
 
@@ -156,8 +170,8 @@ AI 辅助的科研选题流程，**以研究者自身输入为唯一出发点**�
 
 ### 10.6 信任边界（如实声明）
 
-闸门只校验字段与 hash 绑定，**不提供密码学身份保证**。蓄意伪造一整套自洽
-transcript+verdict+匹配 hash 仍可能（v1.1 级残留）。
+闸门校验字段、hash 绑定、transcript hash 与 P0 处置闭环，**不提供密码学身份保证**。
+蓄意伪造一整套自洽 transcript+verdict+匹配 hash 仍可能（v1.2 级残留）。
 彻底闭合需受控 runner 外部登记审查行为，超出本技能范围。
 
 ---
@@ -224,5 +238,5 @@ transcript+verdict+匹配 hash 仍可能（v1.1 级残留）。
 - If the user provides an article, policy, document, or URL as source material, read/analyze it first and preserve useful knowledge according to the knowledge-wiki rules.
 - If current policy, literature, journal, or grant information is needed, use web/search tools; do not fabricate recency.
 - Do not include “research draft grill me” as part of the default workflow. Only pressure-test drafts if the user explicitly asks.
-- **v1.1 新增**：进入任何 BLOCKING Phase 前必须先过 `selection_gate.py`；scan/topics 必须独立审查，
+- **v1.2 要求**：BLOCKING 产物完成后必须先过 `selection_gate.py`；scan/topics 必须独立审查，
   禁止主线程自审自盖合格章；降级必须留痕，断点续写不得静默绕过上游闸。
