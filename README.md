@@ -2,7 +2,7 @@
 
 按目录组织的 Agent 技能包合集。从科研工具起步，现已扩展为四类能力：
 
-- **学术研究与评审** — 文献导读、开题评审、同行评议、基金评审
+- **学术研究与评审** — 文献导读、科研选题、开题评审、同行评议、基金评审
 - **写作与去 AI 味** — 公众号长文、英文/中文去AI痕迹、经管文献综述
 - **方案拷打与对齐** — 高强度追问式设计审查，带文档同步
 - **工具与教学** — RAGflow 客户端、Stata coefplot 作图、口播视频制作、Mem0 记忆管理、技能教学
@@ -18,6 +18,7 @@
 | `proposal-review-expert/` | 学术评审 | 开题报告 / 研究计划分层评审 | 开题报告 PDF、纯文本 | 可选 `mineru-open-api` |
 | `peer-review/` | 学术评审 | 同行评议、审稿意见回复、基金申请书评审 | 论文全文、审稿意见、基金申请书 | 无强制外部依赖 |
 | `econ-literature-review-writer/` | 学术写作 | 经济管理类文献综述与 GB/T 7714 参考文献整理 | 文献摘要、笔记、参考文献清单 | 无强制外部依赖 |
+| `research-topic-selection/` | 学术研究 | AI 辅助科研选题全流程：从模糊兴趣到 3+2 可申报课题，含刚性闸门与独立审查 | 研究兴趣、政策材料、数据基础 | Python 3（闸门脚本） |
 | `社科基金题目评审/` | 学术申报 | 评审社科基金题目是否规范、清晰、可申报 | 题目候选 | 无强制外部依赖 |
 | `社科基金选题说明撰写指南/` | 学术申报 | 生成 500 字内选题说明 | 题目、问题意识、政策依据 | 无强制外部依赖 |
 | `ragflow-client/` | 工具 | 调用 RAGflow 知识库问答，结果与网页端一致 | 问题文本、会话 ID | Python 3、RAGflow 服务 |
@@ -64,6 +65,7 @@ cp -r ./stop-ai-slop-zh ~/.config/opencode/skills/
 
 ```text
 文献导读
+科研选题
 开题评审
 同行评议
 文献综述
@@ -103,6 +105,7 @@ myskill/
 ├── peer-review/                       同行评议
 ├── proposal-review-expert/            开题评审
 ├── ragflow-client/                    RAGflow 问答客户端
+├── research-topic-selection/          科研选题全流程
 ├── stop-ai-slop-zh/                   中文去 AI 味
 ├── teach/                             技能教学
 ├── 口播视频制作/                      配音动画视频
@@ -123,6 +126,8 @@ myskill/
 | [econ-literature-review-writer/README.md](./econ-literature-review-writer/README.md) | 经管类文献综述说明 |
 | [coefplot/docs/demo.md](./coefplot/docs/demo.md) | coefplot 场景示例 |
 | [ragflow-client/SKILL.md](./ragflow-client/SKILL.md) | RAGflow 客户端说明 |
+| [research-topic-selection/SKILL.md](./research-topic-selection/SKILL.md) | 科研选题系统（v1.1 含闸门与审查） |
+| [research-topic-selection/references/](./research-topic-selection/references/) | 选题参考文档（学科分支、审查节点、扫描清单） |
 | [mem0-memory-flow/SKILL.md](./mem0-memory-flow/SKILL.md) | Mem0 记忆管理工作流说明 |
 
 ## 说明
