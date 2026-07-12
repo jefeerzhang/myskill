@@ -14,7 +14,7 @@
 | 目录 | 分类 | 一句话说明 | 典型输入 | 外部依赖 |
 |---|---|---|---|---|
 | `academic-literature-guide-v2/` | 学术研究 | PDF / URL / DOI 转四层递进式文献导读 | PDF、链接、DOI、标题 | `mineru-open-api` |
-| `material-ideation/` | 学术研究 | 从材料中提炼研究问题、假设和识别策略 | 文件夹、PDF、Word、Markdown | 本地文件读取，可选 RAG |
+
 | `proposal-review-expert/` | 学术评审 | 开题报告 / 研究计划分层评审 | 开题报告 PDF、纯文本 | 可选 `mineru-open-api` |
 | `peer-review/` | 学术评审 | 同行评议、审稿意见回复、基金申请书评审 | 论文全文、审稿意见、基金申请书 | 无强制外部依赖 |
 | `econ-literature-review-writer/` | 学术写作 | 经济管理类文献综述与 GB/T 7714 参考文献整理 | 文献摘要、笔记、参考文献清单 | 无强制外部依赖 |
@@ -99,7 +99,7 @@ myskill/
 ├── grill-me/                          拷打方案（基础版）
 ├── grill-with-docs/                   拷打方案（带文档同步）
 ├── khazix-writer/                     公众号长文
-├── material-ideation/                 材料驱动研究构思
+
 ├── mattpocock-grilling/               拷打方案（高强度版）
 ├── mem0-memory-flow/                  Mem0 记忆管理工作流
 ├── peer-review/                       同行评议
