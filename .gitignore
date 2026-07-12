@@ -27,6 +27,9 @@ memory/*.jsonl
 *.tmp
 *.bak
 
+# ===== 本地工具元数据 =====
+.reasonix/
+
 # ===== Python =====
 __pycache__/
 *.pyc
