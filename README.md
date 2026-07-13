@@ -17,7 +17,7 @@
 | `proposal-review-expert/` | 学术评审 | 开题报告 / 研究计划分层评审 | 开题报告 PDF、纯文本 | 可选 `mineru-open-api` |
 | `peer-review/` | 学术评审 | 同行评议、审稿意见回复、基金申请书评审 | 论文全文、审稿意见、基金申请书 | 无 |
 | `econ-literature-review-writer/` | 学术写作 | 经济管理类文献综述与 GB/T 7714 参考文献整理 | 文献摘要、笔记、参考文献清单 | 无 |
-| `research-topic-selection/` | 学术研究 | AI 辅助科研选题全流程（v1.4），含冻结协议、刚性闸门、独立审查、好问题压力测试与断点续写 | 研究兴趣、政策材料、数据基础 | Python 3 |
+| `research-topic-selection/` | 学术研究 | AI 辅助科研选题全流程（v1.5.2），含冻结协议、刚性闸门、独立审查、Grill 决策追问、好问题压力测试与断点续写 | 研究兴趣、政策材料、数据基础 | Python 3 |
 | `社科基金题目评审/` | 学术申报 | 评审社科基金题目是否规范、清晰、可申报 | 题目候选 | 无 |
 | `social-science-fund-topic-guide/` | 学术申报 | 生成 500 字内选题说明 | 题目、问题意识、政策依据 | 无 |
 | `ragflow-client/` | 工具 | 调用 RAGflow 知识库问答，结果与网页端一致 | 问题文本、会话 ID | Python 3、RAGflow 服务 |
@@ -103,7 +103,7 @@ myskill/
 ├── peer-review/                       同行评议
 ├── proposal-review-expert/            开题评审
 ├── ragflow-client/                    RAGflow 问答客户端
-├── research-topic-selection/          科研选题全流程（v1.4）
+├── research-topic-selection/          科研选题全流程（v1.5.2）
 ├── stop-ai-slop-zh/                   中文去 AI 味
 ├── teach/                             技能教学
 ├── 口播视频制作/                      配音动画视频
@@ -124,7 +124,7 @@ myskill/
 | [econ-literature-review-writer/README.md](./econ-literature-review-writer/README.md) | 经管类文献综述说明 |
 | [coefplot/docs/demo.md](./coefplot/docs/demo.md) | coefplot 场景示例 |
 | [ragflow-client/SKILL.md](./ragflow-client/SKILL.md) | RAGflow 客户端说明 |
-| [research-topic-selection/README.md](./research-topic-selection/README.md) | 科研选题系统说明（v1.4） |
+| [research-topic-selection/README.md](./research-topic-selection/README.md) | 科研选题系统说明（v1.5.2） |
 | [research-topic-selection/SKILL.md](./research-topic-selection/SKILL.md) | 科研选题核心流程与闸门规则 |
 | [research-topic-selection/references/](./research-topic-selection/references/) | 选题参考文档 |
 | [mem0-memory-flow/SKILL.md](./mem0-memory-flow/SKILL.md) | Mem0 记忆管理工作流说明 |

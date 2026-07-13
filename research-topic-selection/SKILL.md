@@ -116,8 +116,8 @@ python scripts/selection_gate.py --workdir <wd> --enter materials
 - **数据/材料扫描**：公开数据集、可得性分级（可得/需申请/不可得）。
 - **发表/申报窗口扫描**：目标期刊、基金指南、截止时间。
 
-**硬性约束**：凡涉时效性必须实际调用检索（本地 anysearch / web_google 等联网检索工具），
-禁止编造近期性；每维至少 1 条反面/竞争性证据（反确认偏差，清单 §六）。
+**硬性约束**：凡涉时效性必须实际调用检索（本地 anysearch / web_search / web_google 等联网检索工具），
+禁止编造近期性；每维至少 1 条反面/竞争性证据（反确认偏差，清单 §六）。**每个存在 `verified` 证据的维度，必须至少有一条 `counter` 或 `mixed` 证据；`unavailable` 条目必须登记至少两个检索式；`verified` 条目的 `source_url` 必须是 `http(s)` URL。**
 除 Markdown 外，把决定选题判断的证据逐条写入 `review/evidence_registry.jsonl`；字段规范见
 `references/artifact-schemas.md`。找不到可靠来源时使用 `status=unavailable` 并登记至少两个检索式，禁止编造链接。
 落盘：`03_五维扫描.md`（含末尾"反确认偏差记录"段）和证据台账。
@@ -138,7 +138,9 @@ python scripts/selection_gate.py --workdir <wd> --enter materials
 落盘：`04_问题域地图.md`。地图须自洽（核心问题↔分支↔数据↔切口），过度发散须收敛。
 
 > **scan 独立审查（critical，independent）**：过闸后调用独立审查者审 03+04，
-> 输出 verdict JSON（模板见 `references/review-nodes.md`），`p0_open=0` 才放行进入 Phase 5。
+> 输出 verdict JSON（模板与执行方式见 `references/review-nodes.md`），`p0_open=0` 才放行进入 Phase 5。
+> 主线程应先用 `scripts/selection_gate.py --hash-template scan` 生成 artifact hash 模板并提供给审查者，
+> 以解决 read-only 子代理无法执行 shell 计算 hash 的问题。
 > 前过 `python scripts/selection_gate.py --workdir <wd> --enter scan-review`
 > （数字入口 `--enter 4`；校验 scope+03+04、scan review、hash、transcript 与 P0 闭环）。
 
@@ -176,7 +178,8 @@ python scripts/selection_gate.py --workdir <wd> --enter materials
 推翻条件、两周 pilot、资源需求、最强评审质疑和下一步动作。
 
 同步填写 `review/question_scores.json`：5-10 个候选的六维整数评分、总分、决策、理由和淘汰规则；
-入选 ID 必须与好问题卡一致。格式见 `references/artifact-schemas.md`。
+入选 ID 必须与好问题卡一致。**评分规范：六维均为 1-5 整数；`decision` 只能取 `selected` / `parked` / `dropped`，其中 `dropped` 必须填写 `kill_rule`；`selected_card_ids` 必须与 `decision=selected` 的候选完全一致。**格式见
+`references/artifact-schemas.md`。
 
 落盘：`07A_好问题卡.md` 和 `review/question_scores.json`。
 
@@ -192,6 +195,7 @@ python scripts/selection_gate.py --workdir <wd> --enter materials
 落盘：`08_选题推荐.md`。
 
 > **topics 独立审查（critical，independent）**：调用独立审查者审 07+07A+08，verdict `p0_open=0` 才放行 final。
+> 执行方式与 scan 独立审查相同：主线程先用 `scripts/selection_gate.py --hash-template topics` 生成 hash 模板并提供给审查者。
 > 前过 `python scripts/selection_gate.py --workdir <wd> --enter topics`
 > （数字入口 `--enter 7`；重跑 questions 上游链，校验 07+07A+08、结构化评分、topics review 与 hash 闭环）。
 
@@ -215,9 +219,37 @@ final 会重新核验 scope→materials→scan→scan-review→literature→ques
 
 ---
 
-## 十一、刚性闸门与审查机制（v1.5.2 核心）
+## 十一、决策追问（Grill）机制
 
-### 11.1 闸门
+借鉴 `grill-me` 思路，在需要用户做判断的关键节点，采用**一次只追问一个决策、每个问题附带推荐答案**的方式，
+沿决策树分支逐步推进，直到达成 shared understanding 后再进入下一阶段。
+
+### 11.1 适用场景
+
+- **Phase 0-1 scope 确认**：学科取向、利害关系档、时间窗口、语言偏好、硬约束等维度，逐项确认。
+  主线程根据用户三问及已有材料给出推荐选项，用户确认或纠正后再进入下一项。
+  "为什么是现在"由 Phase 2 五维扫描自然回答，不单独作为前置追问。
+- **Phase 1.5 材料研判确认**：展示研判摘要后，逐条确认"用户已有研究问题""材料冲突""检索约束"等关键判断；
+  用户有纠正时，先更新 `02_用户材料研判.md` 再过 materials 闸。
+- **Phase 6.5 好问题压力测试**：对排名最高的 1-3 个候选问题，按 6 个关键字段逐项追问：
+  核心研究问题、为什么值得做、默认假设与竞争性解释、关键判别证据与推翻条件、两周 pilot 与下一步动作、资源需求与最强评审质疑。
+- **Phase 7 最终选题确认**：对最推荐选题，追问关键决策（样本范围、理论框架、方法路径、风险承受能力），
+  确认后再落盘 `08_选题推荐.md`。
+- **P0 处置闭环**：独立审查提出 P0 后，逐一追问每个 P0 的修正方案，回送原审查者复核。
+
+### 11.2 追问原则
+
+1. **一次只问一个决策**：不把学科取向、利害关系档、时间窗口等问题同时抛出。
+2. **推荐答案与提示清单结合**：对学科取向、时间窗口等可推断项，给出"我建议选 X，理由是..."；对硬约束等必须用户主动声明的项，用提示清单引导用户逐项输入，不预设"暂无"。
+3. **纠正即更新**：用户纠正后，立即重写对应落盘文件并重新过相关闸门，不在下游沿用旧判断。
+4. **确认即留痕**：在 `01_三问与澄清.md`、研判文件、好问题卡或选题推荐中，体现用户已确认的关键决策。
+5. **不无限追问**：每个节点的追问有明确边界（如 scope 的 5 个维度、好问题卡的 6 个关键字段），达成边界后停止。
+
+---
+
+## 十二、刚性闸门与审查机制（v1.5.2 核心）
+
+### 12.1 闸门
 
 `python scripts/selection_gate.py --workdir <wd> --enter {scope,materials,scan,scan-review,literature,questions,topics,final}`
 
@@ -245,19 +277,19 @@ final 会重新核验 scope→materials→scan→scan-review→literature→ques
 
 使用 `python scripts/selection_gate.py --workdir <wd> --status` 诊断最早阻塞点；status 只报告，不绕过闸门。
 
-### 11.2 审查分离（强制）
+### 12.2 审查分离（强制）
 
 - scan / topics 两道 critical 闸强制 **independent** 审查：审查者上下文不含产出过程，只读落盘产物。
 - `reviewer_agent_id ≠ producer_agent_id`（闸门字段级校验）。
 - 不依赖特定外部 runner；本地用 subagent 机制或另起会话承担。
 - 其余阶段（三问/澄清/趋势/缺口）主线程自检，不强制独立审查。
 
-### 11.3 处置闭环（禁自审）
+### 12.3 处置闭环（禁自审）
 
 审查报 P0 → 执行者写 `review/dispositions_<node>.json` → **回送原审查者复核**
 （`reviewer_decision: accepted|rejected`），rejected 须重修正再审。回环 ≤ 3 轮。
 
-### 11.4 降级车道（降级有痕，不静默）
+### 12.4 降级车道（降级有痕，不静默）
 
 | id | 触发 | 处理方式 | 是否降 high |
 |----|------|----------|--------------|
@@ -267,12 +299,12 @@ final 会重新核验 scope→materials→scan→scan-review→literature→ques
 | explicit-opt-out | 用户主动放弃独立审查 | 记 justification，下游知情 | 否 |
 | resume-jump | 用户"从某步继续" | **必过前置闸**，上游 BLOCKING 不可静默绕过 | 否 |
 
-### 11.5 断点续写
+### 12.5 断点续写
 
 用户"从第 X 步继续/从推荐开始"等：先运行 `selection_gate --status`，再对目标阶段执行
 `selection_gate --enter <对应>`。后段闸门会重新执行全部上游校验；上游产物缺失或 hash 过期则 FAIL。
 
-### 11.6 信任边界（如实声明）
+### 12.6 信任边界（如实声明）
 
 闸门校验字段、hash 绑定、transcript hash 与 P0 处置闭环，**不提供密码学身份保证**。
 蓄意伪造一整套自洽 transcript+verdict+匹配 hash 仍可能（v1.5.2 级残留）。
@@ -373,6 +405,7 @@ final 会重新核验 scope→materials→scan→scan-review→literature→ques
 - If no files are available, require at least a user-authored working title and abstract. There is no silent opt-out from the materials gate.
 - If the user provides an article, policy, document, or URL as source material, read/analyze it first and preserve useful knowledge according to the knowledge-wiki rules.
 - If current policy, literature, journal, or grant information is needed, use web/search tools; do not fabricate recency.
+- **检索工具统一**：执行五维扫描时，优先调用本地 `anysearch` skill 或 `web_search` / `web_fetch` 工具；对每一维的关键结论，必须保留至少一个可追溯的来源 URL 或显式 `unavailable` 记录。
 - Do not include “research draft grill me” as part of the default workflow. Only pressure-test drafts if the user explicitly asks.
 - 若用户只要求优化一个已有题目，可从 Phase 6.5 开始，但必须先提供或补齐相当于 07 的缺口与证据基础。
 - **v1.5.2 要求**：新任务首次响应先发送创建者、流程和多轮交互说明；再冻结 protocol；scope 后强制暂停获取用户材料并完成 02 研判；关键检索结论进入 evidence_registry；候选评分进入 question_scores；

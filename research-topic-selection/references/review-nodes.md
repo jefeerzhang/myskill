@@ -59,6 +59,7 @@
 - `artifact_hashes` 由**审查者本人**对它实际读到的产物计算（shell `sha256sum` 或等价），
   逐文件填写——声明"我审的就是这一版"。selection_gate 会与当前文件实算值比对，
   防旧 verdict 重放、防审后再改产物。
+- **若平台 read-only subagent 无法执行 shell 命令，应采用模式 A**：主线程先用 `--hash-template` 生成 hash 模板并传给 subagent，subagent 确认读到的产物与模板 hash 一致后直接引用。不一致时须拒绝引用并报告。
 - 各节点绑定文件以 `scripts/selection_gate.py` 的 `REVIEW_BINDINGS` 为准。scan 同时绑定冻结协议、三问、
   用户材料 manifest、材料研判、五维扫描、问题域地图和结构化证据台账；topics 同时绑定协议、文献脉络、趋势、缺口、好问题卡、
   3+2 推荐、证据台账和候选评分。任何被绑定文件改变后旧 verdict 失效。
@@ -66,7 +67,36 @@
 - `agent_output_sha256` 必须等于完整 transcript 文件的 sha256。selection_gate 还会读取 transcript
   末尾 fenced JSON，与 `review/review_<node>.json` 的原始字段逐项比对。
 
-## 三、处置闭环（禁自审的核心）
+## 三、执行模式与 hash 计算（v1.5.2 修订）
+
+### 3.1 审查分离的本质
+
+`independent` 审查的核心是**上下文隔离**：审查者不能读取主线程的中间思考、草稿或迭代过程，只能基于落盘产物做判断。它**不必然要求**审查 subagent 处于 read-only 或不能写文件。
+
+### 3.2 hash 计算的两种可行模式
+
+在当前 Hana/OpenHanako 等平台中，read-only subagent 通常**无法执行 shell 命令**计算文件 SHA-256，导致 verdict 中的 `artifact_hashes` 无法被 `selection_gate.py` 接受。推荐以下两种模式：
+
+**模式 A：主线程预计算 hash 模板（推荐，改动最小）**
+1. 主线程在送审前运行：
+   ```bash
+   python scripts/selection_gate.py --workdir <wd> --hash-template scan
+   python scripts/selection_gate.py --workdir <wd> --hash-template topics
+   ```
+2. 将生成的 hash 模板作为提示词的一部分传给独立审查 subagent；
+3. subagent 读取落盘产物后，确认模板中的 hash 与自己读到的内容一致，并**直接引用**这些 hash 填写 `artifact_hashes`；
+4. 若 subagent 发现主线程在生成模板后、送审前修改了产物，应在审查报告中声明并拒绝引用旧 hash。
+
+**模式 B：subagent 在 write 模式下执行 hash 计算**
+1. 独立审查 subagent 仍然只读落盘产物，但允许其执行 shell/Python 命令计算 SHA-256；
+2. subagent 自行计算 `artifact_hashes` 并写入 `review/review_<node>.json` 和 `review/transcripts/<node>_r<round>.md`；
+3. 只要 subagent 的上下文不包含主线程产出过程，此模式不破坏审查分离原则。
+
+### 3.3 对 read-only subagent 的限制说明
+
+如果当前平台仅支持 read-only subagent 且禁止其执行任何命令，则**必须采用模式 A**。主线程不得以“审查者自己算”为由跳过 hash 模板传递，否则 `selection_gate.py` 会因 `artifact_hashes` 缺失或 PLACEHOLDER 而 FAIL。
+
+## 四、处置闭环（禁自审的核心）
 
 审查报 P0 后：
 1. 执行者逐条处置，写 `review/dispositions_<node>.json`：
@@ -83,7 +113,7 @@
    都必须有合法 `status`、非空 `evidence`、`reviewer_decision: accepted`。原审查者重签 verdict 时还必须把
    `review/dispositions_<node>.json` 的终版 SHA-256 加入 `artifact_hashes`，防止复核后无痕改写台账。
 
-## 四、审查关注点清单（选题专用）
+## 五、审查关注点清单（选题专用）
 
 **scan 节点：**
 - 协议是否真实冻结：交付类型、stakes、学科分支、时间窗口和约束是否与用户输入一致。
@@ -108,18 +138,24 @@
 - 判断是否自洽：优先/可以/谨慎/暂缓的分级理由是否一致，最推荐项是否有压倒性依据。
 - 去 AI 味：中文表述是否落入模板腔（参考本地 writing_principles_sop）。
 
-## 五、hash 模板辅助
+## 六、hash 模板辅助（与模式 A 配套）
 
-主线程可以在送审前生成当前 artifact hash 模板，供审查者核对：
+主线程必须在送审前生成当前 artifact hash 模板，并**作为提示词内容传递给审查 subagent**：
 
 ```bash
 python scripts/selection_gate.py --workdir <wd> --hash-template scan
 python scripts/selection_gate.py --workdir <wd> --hash-template topics
 ```
 
-审查者仍应以自己实际读取到的文件为准填写 hash；模板只用于降低手工出错率。
+在 subagent 提示词中应明确说明：
+- 这是主线程预计算的 hash 模板；
+- 审查者需确认自己读到的产物与模板 hash 一致；
+- 若不一致，应在审查报告中声明并拒绝引用旧 hash；
+- 若一致，可直接将模板中的 hash 填入 verdict JSON 的 `artifact_hashes` 字段。
 
-## 六、信任边界（如实声明）
+审查者仍应以自己实际读取到的文件为准判断内容质量；hash 模板仅用于解决 read-only 子代理无法执行 shell 命令计算 hash 的问题，不降低审查独立性。
+
+## 七、信任边界（如实声明）
 
 本机制校验字段、hash 绑定、transcript hash 与 P0 处置闭环，**不提供密码学身份保证**。
 蓄意伪造一整套自洽 transcript + verdict + 匹配 hash 仍是可能的（v1.5.2 级残留）。
