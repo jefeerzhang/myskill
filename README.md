@@ -19,7 +19,7 @@
 | `econ-literature-review-writer/` | 学术写作 | 经济管理类文献综述与 GB/T 7714 参考文献整理 | 文献摘要、笔记、参考文献清单 | 无 |
 | `research-topic-selection/` | 学术研究 | AI 辅助科研选题全流程（v1.4），含冻结协议、刚性闸门、独立审查、好问题压力测试与断点续写 | 研究兴趣、政策材料、数据基础 | Python 3 |
 | `社科基金题目评审/` | 学术申报 | 评审社科基金题目是否规范、清晰、可申报 | 题目候选 | 无 |
-| `社科基金选题说明撰写指南/` | 学术申报 | 生成 500 字内选题说明 | 题目、问题意识、政策依据 | 无 |
+| `social-science-fund-topic-guide/` | 学术申报 | 生成 500 字内选题说明 | 题目、问题意识、政策依据 | 无 |
 | `ragflow-client/` | 工具 | 调用 RAGflow 知识库问答，结果与网页端一致 | 问题文本、会话 ID | Python 3、RAGflow 服务 |
 | `coefplot/` | 工具 | 生成 Stata `coefplot` 回归系数图代码与示例 | 回归模型、作图需求 | Stata、`coefplot` ado |
 | `口播视频制作/` | 多媒体 | 文章 / 口播稿转配音动画视频 | 文稿、音色要求、输出目录 | HyperFrames、FFmpeg、MiMo TTS |
@@ -108,7 +108,7 @@ myskill/
 ├── teach/                             技能教学
 ├── 口播视频制作/                      配音动画视频
 ├── 社科基金题目评审/                  基金题目评审
-└── 社科基金选题说明撰写指南/          选题说明生成
+└── social-science-fund-topic-guide/          选题说明生成
 ```
 
 ## 文档入口
