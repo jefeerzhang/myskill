@@ -92,23 +92,23 @@ mem0 suggest
 ```text
 myskill/
 ├── academic-literature-guide-v2/      学术文献导读
-├── avoid-ai-writing/                  英文去 AI 味
 ├── coefplot/                          Stata 回归系数图
 ├── econ-literature-review-writer/     经管文献综述
-├── grill-me/                          拷打方案（基础版）
-├── grill-with-docs/                   拷打方案（带文档同步）
-├── khazix-writer/                     公众号长文
-├── mattpocock-grilling/               拷打方案（高强度版）
-├── mem0-memory-flow/                  Mem0 记忆管理工作流
 ├── peer-review/                       同行评议
 ├── proposal-review-expert/            开题评审
-├── ragflow-client/                    RAGflow 问答客户端
 ├── research-topic-selection/          科研选题全流程（v1.5.2）
-├── stop-ai-slop-zh/                   中文去 AI 味
-├── teach/                             技能教学
-├── 口播视频制作/                      配音动画视频
+├── social-science-fund-topic-guide/   社科基金选题说明（500 字内）
 ├── 社科基金题目评审/                  基金题目评审
-└── social-science-fund-topic-guide/          选题说明生成
+├── avoid-ai-writing/                  英文去 AI 味
+├── stop-ai-slop-zh/                   中文去 AI 味
+├── khazix-writer/                     公众号长文
+├── grill-me/                          拷打方案（基础版）
+├── grill-with-docs/                   拷打方案（带文档同步）
+├── mattpocock-grilling/               拷打方案（高强度版）
+├── ragflow-client/                    RAGflow 问答客户端
+├── mem0-memory-flow/                  Mem0 记忆管理工作流
+├── 口播视频制作/                      配音动画视频
+└── teach/                             技能教学
 ```
 
 ## 文档入口
