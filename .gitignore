@@ -29,6 +29,10 @@ memory/*.jsonl
 
 # ===== 本地工具元数据 =====
 .reasonix/
+.mimocode/
+
+# ===== 选题工作目录（运行时产物）=====
+research-topic-selection/workspace_*/
 
 # ===== Python =====
 __pycache__/

@@ -3,7 +3,7 @@
   "description": "技能分类映射，用于按类别浏览和安装",
   "categories": {
     "学术研究": {
-      "skills": ["academic-literature-guide-v2", "material-ideation"],
+      "skills": ["academic-literature-guide-v2", "research-topic-selection"],
       "icon": "📖"
     },
     "学术评审": {
