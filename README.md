@@ -5,7 +5,7 @@
 - **学术研究与评审** — 文献导读、科研选题、开题评审、同行评议、基金评审
 - **写作与去 AI 味** — 公众号长文、英文/中文去 AI 痕迹、经管文献综述
 - **方案拷打与对齐** — 高强度追问式设计审查，带文档同步
-- **工具与教学** — RAGflow 客户端、Stata coefplot 作图、口播视频制作、Mem0 记忆管理、技能教学
+- **工具与教学** — RAGflow 客户端、Stata coefplot 作图、口播视频制作、Mem0 记忆管理、技能教学、OpenSpace 技能委托与发现
 
 每个子目录都是一个独立技能，核心文件是 `SKILL.md`。不带 `SKILL.md` 的目录不属于技能模块。
 
@@ -31,6 +31,8 @@
 | `grill-with-docs/` | 方案评审 | 结合项目文档和术语体系拷打方案，同步文档 | 方案、项目文档、术语约定 | 项目上下文 |
 | `mattpocock-grilling/` | 方案评审 | 高强度追问式设计审查 | 计划、设计稿 | 无 |
 | `teach/` | 教学 | 在当前 workspace 中讲解新技能或概念 | 待讲解的 skill 或概念 | 无 |
+| `delegate-task/` | 工具 / Agent | 将复杂任务委托给 OpenSpace 执行，支持技能自进化 | 多步骤任务、超出当前能力的任务 | Python 3、OpenSpace |
+| `skill-discovery/` | 工具 / Agent | 搜索本地和云端 OpenSpace 技能库 | 技能查询、能力缺口 | Python 3、OpenSpace |
 
 ## 安装
 
@@ -108,7 +110,9 @@ myskill/
 ├── ragflow-client/                    RAGflow 问答客户端
 ├── mem0-memory-flow/                  Mem0 记忆管理工作流
 ├── 口播视频制作/                      配音动画视频
-└── teach/                             技能教学
+├── teach/                             技能教学
+├── delegate-task/                     OpenSpace 任务委托
+└── skill-discovery/                   OpenSpace 技能发现
 ```
 
 ## 文档入口
@@ -128,6 +132,8 @@ myskill/
 | [research-topic-selection/SKILL.md](./research-topic-selection/SKILL.md) | 科研选题核心流程与闸门规则 |
 | [research-topic-selection/references/](./research-topic-selection/references/) | 选题参考文档 |
 | [mem0-memory-flow/SKILL.md](./mem0-memory-flow/SKILL.md) | Mem0 记忆管理工作流说明 |
+| [delegate-task/SKILL.md](./delegate-task/SKILL.md) | OpenSpace 任务委托与技能自进化 |
+| [skill-discovery/SKILL.md](./skill-discovery/SKILL.md) | OpenSpace 技能搜索与发现 |
 
 ## 说明
 

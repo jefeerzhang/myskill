@@ -30,6 +30,7 @@ memory/*.jsonl
 # ===== 本地工具元数据 =====
 .reasonix/
 .mimocode/
+.skill_id
 
 # ===== 选题工作目录（运行时产物）=====
 research-topic-selection/workspace_*/
