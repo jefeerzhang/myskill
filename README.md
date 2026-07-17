@@ -24,7 +24,7 @@
 | `coefplot/` | 工具 | 生成 Stata `coefplot` 回归系数图代码与示例 | 回归模型、作图需求 | Stata、`coefplot` ado |
 | `口播视频制作/` | 多媒体 | 文章 / 口播稿转配音动画视频 | 文稿、音色要求、输出目录 | HyperFrames、FFmpeg、MiMo TTS |
 | `mem0-memory-flow/` | 工具 / 记忆 | 有审批流程的 Mem0 长期记忆管理 | 待记忆的事实、用户偏好、项目规则 | Python 3、Mem0 API |
-| `khazix-writer/` | 写作 | 基于素材生成公众号长文 | brief、链接、PDF、录音转文字 | 无 |
+| `khazix-writer/` | 写作 | 基于素材生成公众号长文，含五层自检体系（句式重复检测） | brief、链接、PDF、录音转文字 | 无 |
 | `avoid-ai-writing/` | 写作 | 英文或通用文本去 AI 味，支持审计和改写 | 文本、文件 | 无 |
 | `stop-ai-slop-zh/` | 写作 | 中文文本去 AI 味，六维量规评分 ≥35 | 中文文案、邮件、摘要、长文 | 无 |
 | `grill-me/` | 方案评审 | 围绕 plan/design 持续追问，直到对齐 | 计划、设计稿、需求 | 无 |
