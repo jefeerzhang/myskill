@@ -1,142 +1,255 @@
-# myskill - Agent 技能仓库
+# 科研技能包合集（OpenClaw / LobsterAI / CoPaw / OpenSpace）
 
-按目录组织的 Agent 技能包合集。从科研工具起步，现已扩展为四类能力：
+本仓库是一组围绕「做科研全流程」的 Agent 技能（skill）合集：从材料构思、文献导读、社科基金申报，到开题评审、同行评议、文献综述写作、口播视频制作，以及写作去 AI 味、Mem0 记忆管理等通用增强能力。
 
-- **学术研究与评审** — 文献导读、科研选题、开题评审、同行评议、基金评审
-- **写作与去 AI 味** — 公众号长文、英文/中文去 AI 痕迹、经管文献综述
-- **方案拷打与对齐** — 高强度追问式设计审查，带文档同步
-- **工具与教学** — RAGflow 客户端、Stata coefplot 作图、口播视频制作、Mem0 记忆管理、技能教学、OpenSpace 技能委托与发现
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)](#)
 
-每个子目录都是一个独立技能，核心文件是 `SKILL.md`。不带 `SKILL.md` 的目录不属于技能模块。
+---
 
 ## 技能清单
 
-| 目录 | 分类 | 一句话说明 | 典型输入 | 外部依赖 |
-|---|---|---|---|---|
-| `academic-literature-guide-v2/` | 学术研究 | PDF / URL / DOI 转四层递进式文献导读 | PDF、链接、DOI、标题 | `mineru-open-api` |
-| `proposal-review-expert/` | 学术评审 | 开题报告 / 研究计划分层评审 | 开题报告 PDF、纯文本 | 可选 `mineru-open-api` |
-| `peer-review/` | 学术评审 | 同行评议、审稿意见回复、基金申请书评审 | 论文全文、审稿意见、基金申请书 | 无 |
-| `econ-literature-review-writer/` | 学术写作 | 经济管理类文献综述与 GB/T 7714 参考文献整理 | 文献摘要、笔记、参考文献清单 | 无 |
-| `research-topic-selection/` | 学术研究 | AI 辅助科研选题全流程（v1.5.2），含冻结协议、刚性闸门、独立审查、Grill 决策追问、好问题压力测试与断点续写 | 研究兴趣、政策材料、数据基础 | Python 3 |
-| `社科基金题目评审/` | 学术申报 | 评审社科基金题目是否规范、清晰、可申报 | 题目候选 | 无 |
-| `social-science-fund-topic-guide/` | 学术申报 | 生成 500 字内选题说明 | 题目、问题意识、政策依据 | 无 |
-| `ragflow-client/` | 工具 | 调用 RAGflow 知识库问答，结果与网页端一致 | 问题文本、会话 ID | Python 3、RAGflow 服务 |
-| `coefplot/` | 工具 | 生成 Stata `coefplot` 回归系数图代码与示例 | 回归模型、作图需求 | Stata、`coefplot` ado |
-| `口播视频制作/` | 多媒体 | 文章 / 口播稿转配音动画视频 | 文稿、音色要求、输出目录 | HyperFrames、FFmpeg、MiMo TTS |
-| `mem0-memory-flow/` | 工具 / 记忆 | 有审批流程的 Mem0 长期记忆管理 | 待记忆的事实、用户偏好、项目规则 | Python 3、Mem0 API |
-| `khazix-writer/` | 写作 | 基于素材生成公众号长文，含五层自检体系（句式重复检测） | brief、链接、PDF、录音转文字 | 无 |
-| `avoid-ai-writing/` | 写作 | 英文或通用文本去 AI 味，支持审计和改写 | 文本、文件 | 无 |
-| `stop-ai-slop-zh/` | 写作 | 中文文本去 AI 味，六维量规评分 ≥35 | 中文文案、邮件、摘要、长文 | 无 |
-| `grill-me/` | 方案评审 | 围绕 plan/design 持续追问，直到对齐 | 计划、设计稿、需求 | 无 |
-| `grill-with-docs/` | 方案评审 | 结合项目文档和术语体系拷打方案，同步文档 | 方案、项目文档、术语约定 | 项目上下文 |
-| `mattpocock-grilling/` | 方案评审 | 高强度追问式设计审查 | 计划、设计稿 | 无 |
-| `teach/` | 教学 | 在当前 workspace 中讲解新技能或概念 | 待讲解的 skill 或概念 | 无 |
-| `delegate-task/` | 工具 / Agent | 将复杂任务委托给 OpenSpace 执行，支持技能自进化 | 多步骤任务、超出当前能力的任务 | Python 3、OpenSpace |
-| `skill-discovery/` | 工具 / Agent | 搜索本地和云端 OpenSpace 技能库 | 技能查询、能力缺口 | Python 3、OpenSpace |
+| 技能包 | 版本 | 一句话说明 | 适用输入 | 关键依赖 / 可选增强 | 默认输出 |
+| --- | ---: | --- | --- | --- | --- |
+| `academic-literature-guide-v2/` | 2.1.0 | PDF/URL → 四层递进式文献导读（直觉→概念→技术→批判） | PDF、URL、DOI/标题 | 可选：检索验证（Web Search） | `./文献导读/` |
+| `research-topic-selection/` | 1.5.2 | AI 辅助科研选题：材料→外部检索→好问题压力测试→3+2 可申报课题 | 文件夹、PDF/Word/MD | 依赖本地文件读取；可选 RAG | `./研究构想/<材料>/` |
+| `proposal-review-expert/` | 2.0.0 | 开题报告分级评审（本科/硕士/博士）+ 致命伤预警 + 重构建议 | PDF、纯文本 | 可选：RAG 验证（AnythingLLM 等） | `./开题报告评审/` |
+| `peer-review/` | 2.0.0 | 同行评议/审稿意见回复：双轨评审（正常/批判）+ 原则 + 模板 | 论文全文、审稿意见、基金申请书 | 参考规范与模板（见 `templates.md` 等） | 对话输出（可整理为审稿报告） |
+| `social-science-fund-topic-guide/` | — | 社科基金「选题说明」（500 字以内）结构化写作与范例 | 选题信息/要点/政策依据 | 适配「基金申报」写作场景 | 对话输出（可直接粘贴） |
+| `社科基金题目评审/` | — | 社科基金申报题目评审：规范性/创新性/可行性 + 一票否决项 | 题目文本（1–3 个备选更佳） | 适配「基金申报」写作场景 | 对话输出（含改写建议） |
+| `econ-literature-review-writer/` | — | 经济管理类文献综述报告写作（脉络/主题/机制/方法/述评 + GB/T 7714 参考文献） | 文献、摘要、笔记、参考文献清单 | — | 对话输出（综述报告） |
+| `khazix-writer/` | — | 公众号长文写作（按卡兹克风格出稿/续写/扩写） | 素材、PDF、brief、新闻链接、语音转写 | — | 对话输出（长文） |
+| `口播视频制作/` | 1.0.0 | 文章→口播稿→克隆语音→动画画面→MP4 视频 | 文章/口播稿 | HyperFrames、语音克隆 | `*.mp4` |
+| `coefplot/` | — | Stata coefplot 回归系数作图专家（多模型/边际效应/排序） | Stata 命令 / 数据 | Stata + coefplot 包 | Stata 图形 |
+| `stop-ai-slop-zh/` | — | 识别并消除中文 AI 写作痕迹（套话/排比/名词化/八股） | 中文文本 | — | 对话输出（修订稿） |
+| `avoid-ai-writing/` | — | 审计并改写英文 AI 写作痕迹（AI-isms） | 英文文本 | — | 对话输出（修订稿） |
+| `mem0-memory-flow/` | — | Mem0 长期记忆：建议/审核/上传/召回（用户确认工作流） | 记忆条目 | Mem0 服务 | 记忆库更新 |
+| `teach/` | — | 在本 workspace 中教用户一个新 skill 或概念 | 教学主题 | — | 对话输出 |
+| `grill-me/` | — | 围绕 plan/design 持续 interview，直至达成 shared understanding | plan / design | — | 决策树 / 共识 |
+| `grill-with-docs/` | — | 结合既有领域模型挑战 plan，锐化术语并更新文档 | plan + 领域模型 | — | ADR / 术语表 |
+| `skill-discovery/` | — | 本地检索可复用 OpenSpace 技能，必要时逐步浏览云端包 | 需求描述 | OpenSpace | 技能推荐 |
+| `delegate-task/` | — | 将任务委派给 OpenSpace 自主工作节点（编码/DevOps/调研/桌面自动化） | 任务描述 | OpenSpace | 任务结果 |
+| `ragflow-client/` | 2.0.0 | RAGflow 知识库问答：走原生对话 API，可返回引用来源 | 问题文本 | 需要 RAGflow（API Key + Chat ID + Host） | 对话输出（可含引用来源） |
 
-## 安装
+---
 
-### 快速安装
+## 科研流程图
 
-把需要的技能目录复制到你的 Agent 技能根目录下。
+下面按「做科研」的典型顺序，把核心技能串起来，并在「基金申报」「写作增强」等分支加入对应技能。
 
-以 Claude Code / opencode 为例，技能根目录通常是 `~/.config/opencode/skills/`：
+```mermaid
+flowchart TD
+  A[材料 / 灵感 / 调研记录 / 数据线索] -->|research-topic-selection\n科研选题| B[3+2 可申报课题]
 
-```powershell
-# Windows
-Copy-Item -Path ".\peer-review" -Destination "$env:USERPROFILE\.config\opencode\skills\" -Recurse
-Copy-Item -Path ".\stop-ai-slop-zh" -Destination "$env:USERPROFILE\.config\opencode\skills\" -Recurse
+  B --> C{需要补文献 / 找缺口?}
+  C -->|是| D[academic-literature-guide-v2\n文献导读（四层递进）]
+  D --> E[研究缺口 / 文献对话 / 方法细节]
+  C -->|否| E
+
+  E --> S{是否走「社科基金申报」路径?}
+  S -->|是| T[社科基金题目评审\n题目优化与避坑]
+  T --> U[social-science-fund-topic-guide\n选题说明（500 字内）]
+  S -->|否| F
+
+  E --> F[开题报告 / 研究计划草稿]
+  F -->|proposal-review-expert\n开题评审（分级标准）| G[五维评估 + 致命伤预警 + 重构建议]
+  G --> H{通过开题?}
+  H -->|迭代修改| F
+  H -->|通过| I[数据收集与实证分析（你自己执行）]
+
+  I --> J[论文初稿 / 基金稿 / 答辩稿]
+  J -->|peer-review\n同行评议| K[正常版评审 + 批判版审计 + 回复模板]
+  K --> L{需要返工?}
+  L -->|补实验 / 补稳健性| I
+  L -->|补文献 / 重写论证| D
+  L -->|仅润色 / 格式| J
+
+  J --> R[econ-literature-review-writer\n文献综述报告]
+  J --> V[khazix-writer / 口播视频制作\n长文 / 视频转化]
+  J --> W[stop-ai-slop-zh / avoid-ai-writing\n去 AI 味润色]
+  J --> M[投稿 / 基金提交 / 终稿定稿]
 ```
+
+---
+
+## 触发条件
+
+下表来自各技能 `SKILL.md` 中的【触发场景 / 触发关键词】描述，用于快速判断「该用哪个技能」。
+
+| 技能 | 触发场景 | 触发关键词（示例） | 典型指令（示例） |
+| --- | --- | --- | --- |
+| `academic-literature-guide-v2`（文献导读） | 上传 PDF；提供论文链接；请求解读文献；需要文献导读报告 | 帮我读懂这篇、解读 PDF、生成导读、literature guide、explain this paper、一键导读 | `帮我解读这篇 PDF：...` / `帮我解读这个链接的论文：...` |
+| `research-topic-selection`（科研选题） | 用户提供具体材料并请求基于材料提出研究选题/课题 | 科研选题、帮我选题、从材料出发找课题、好问题压力测试 | `读一下这个文件夹，帮我做科研选题：...` |
+| `proposal-review-expert`（开题评审） | 上传开题报告 PDF/文本；请求评审开题；开题评估 | 开题评审、开题报告、评审这个开题、proposal review、research proposal | `评审这份开题报告（硕士层次）...` |
+| `peer-review`（同行评议） | 期刊审稿；基金评审；稿件修改；回复审稿意见 | 同行评议、审稿意见、response to reviewers、rebuttal、投稿 | `请对这篇论文进行同行评议：...` / `帮我逐条回复以下审稿意见：...` |
+| `social-science-fund-topic-guide`（选题说明） | 撰写「选题说明」（500 字以内） | 选题说明、选题依据、社科基金选题、课题论证 | `按 500 字以内写一段选题说明：...` |
+| `社科基金题目评审` | 申报题目把关与改写 | 题目评审、评审题目、看看这个题目、申报题目 | `帮我评审这 3 个社科基金题目：...` |
+| `econ-literature-review-writer`（文献综述） | 已提供文献/摘要/笔记/参考文献，需整理综述 | 文献综述、写综述、文献梳理、研究述评 | `根据我给的文献清单写一份综述：...` |
+| `khazix-writer`（公众号长文） | 撰写/续写公众号长文 | 写文章、写稿子、帮我写、按我的风格写、公众号文章 | `用我的风格把这篇素材写成文章：...` |
+| `口播视频制作` | 把文章/口播稿转成口播视频 | 口播视频、文章转视频、口播稿、动画视频 | `把这篇文章做成口播视频：...` |
+| `coefplot`（Stata 作图） | 在 Stata 中绘制回归系数图 | coefplot、系数图、回归系数可视化、边际效应图 | `用 coefplot 画这个回归的系数图：...` |
+| `stop-ai-slop-zh` / `avoid-ai-writing`（去 AI 味） | 修订中文/英文文本中的 AI 写作痕迹 | 去 AI 味、AI 痕迹、AI-isms、润色像人写的 | `帮我去掉这段中文的 AI 味：...` |
+| `mem0-memory-flow`（记忆管理） | 需要建议/审核/上传/召回长期记忆 | 记一下、保存到记忆、回忆一下、mem0 | `把这条偏好记到记忆里：...` |
+| `teach`（教学） | 在本 workspace 中教用户新 skill/概念 | 教我、讲解、教学、怎么用 | `教我怎么用 coefplot：...` |
+| `grill-me` / `grill-with-docs`（质询） | 围绕 plan/design 持续质询直至共识 | grill、压力测试、挑战我的方案、决策树 | `grill 一下我的开题方案：...` |
+| `skill-discovery` / `delegate-task`（OpenSpace） | 检索本地/云端技能；委派任务给自主工作节点 | openspace、找技能、委派任务、delegate | `帮我找一个能做 X 的技能` / `把这个任务委派给 OpenSpace：...` |
+| `ragflow-client`（知识库问答） | 需要向 RAGflow 知识库提问；回答带引用来源 | ragflow、知识库问答、查知识库、带引用 | `用 ragflow 知识库回答，并给出引用来源：...` |
+
+### proposal vs 同行评议：怎么避免用错？
+
+- **proposal-review-expert（开题评审）**：研究开始前的「计划阶段」评审，核心是「研究问题是否成立、设计是否可执行、层级标准（本科/硕士/博士）是否匹配」。
+  - 典型触发：开题/答辩/研究计划/Proposal/课题申请/硕士博士层级
+- **peer-review（同行评议）**：研究完成后的「投稿/修改阶段」评审，核心是「证据是否充分、方法与统计是否严谨、写作与报告规范是否合规、审稿意见如何逐条回复」。
+  - 典型触发：审稿/审稿意见/Response/Rebuttal/投稿/修改说明/Manuscript
+- **基金评审怎么选**：更像「委员会审稿/专家评审」（国自然/社科基金/基金申请书评估）→ `peer-review`；更像「学生开题/研究计划审核」→ `proposal-review-expert`
+
+---
+
+## 安装与验证
+
+### 前置要求
+
+- [OpenClaw / LobsterAI](https://github.com/openclaw/openclaw) 已安装并运行；或 CoPaw / OpenSpace 运行环境就绪
+- 如需启用 RAG / RAGflow / Mem0 / OpenSpace 等增强能力，需配置相应的 API Key 与服务地址
+
+### 1) 安装 OpenClaw / LobsterAI 技能
+
+macOS / Linux：
 
 ```bash
-# macOS / Linux
-cp -r ./peer-review ~/.config/opencode/skills/
-cp -r ./stop-ai-slop-zh ~/.config/opencode/skills/
+cp -r academic-literature-guide-v2 research-topic-selection proposal-review-expert peer-review social-science-fund-topic-guide 社科基金题目评审 ~/Library/Application\ Support/LobsterAI/SKILLS/
 ```
 
-### 安装后检查
+Windows（PowerShell）：
 
-1. 技能目录下有 `SKILL.md`
-2. 客户端已重载或重启
-3. 外部依赖已单独安装（参见上表最后一列）
-
-## 快速验证
-
-安装后先测最短触发语，再测完整任务。
-
-```text
-文献导读
-科研选题
-开题评审
-同行评议
-文献综述
-coefplot
-ragflow-client
-去 AI 味
-grill me
-teach
-口播视频制作
-mem0 suggest
+```powershell
+Copy-Item -Path "academic-literature-guide-v2","research-topic-selection","proposal-review-expert","peer-review","social-science-fund-topic-guide","社科基金题目评审" -Destination "$env:APPDATA\LobsterAI\SKILLS\" -Recurse
 ```
 
-完整任务示例：
+### 2) 安装 OpenSpace / CoPaw 技能
 
-```text
+`peer-review/`、`ragflow-client/`、`delegate-task/`、`skill-discovery/` 等为 OpenSpace / CoPaw workspace 技能目录结构。
+
+macOS / Linux（默认工作目录 `~/.copaw/` 或 OpenSpace 对应目录）：
+
+```bash
+mkdir -p ~/.copaw/skills
+cp -r peer-review ragflow-client delegate-task skill-discovery ~/.copaw/skills/
+```
+
+Windows（PowerShell，默认工作目录 `%USERPROFILE%\.copaw\`）：
+
+```powershell
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.copaw\skills" | Out-Null
+Copy-Item -Path "peer-review","ragflow-client","delegate-task","skill-discovery" -Destination "$env:USERPROFILE\.copaw\skills\" -Recurse
+```
+
+### 3) 验证安装
+
+在对应 Agent 中分别发送触发关键词（如「文献导读」「科研选题」「开题报告评审」「同行评议」「选题说明」「题目评审」「coefplot」「去 AI 味」「ragflow 知识库问答」），确认技能被正确路由。
+
+---
+
+## 使用方法（示例）
+
+### 1) 文献导读助手（`academic-literature-guide-v2`）
+
+```
 帮我解读这篇 PDF：/path/to/paper.pdf
-请把这段中文改得不像 AI 写的，保留原意。
-来 grill 一下我这个产品方案。
-我在 Stata 里已经跑完回归，请给我一份 coefplot 多模型对比图代码。
-把这段对话中的关键偏好记入 Mem0：用户偏好使用英文回答技术问题。
 ```
+
+```
+帮我解读这个链接的论文：https://arxiv.org/pdf/2509.22186
+```
+
+### 2) 科研选题（`research-topic-selection`）
+
+```
+读一下这个文件夹里的文件，帮我做科研选题：/path/to/materials/
+```
+
+### 3) 开题报告评审专家（`proposal-review-expert`）
+
+```
+评审这份开题报告（硕士层次）
+[粘贴开题报告全文]
+```
+
+### 4) 同行评议（`peer-review`）
+
+```
+请对这篇论文进行同行评议：[粘贴论文内容或上传 PDF]
+```
+
+```
+我收到了审稿意见，帮我写逐条回复（中英文各一份）：...
+```
+
+### 5) 社科基金题目评审 / 选题说明
+
+```
+帮我评审并改写下面 3 个社科基金申报题目（要求：不超过30字、无副标题、核心概念不超过4个）：
+1) ...
+2) ...
+3) ...
+```
+
+```
+请按「选题依据→具体问题→研究视角与方法」的三层结构，写一段 500 字以内的社科基金选题说明：
+- 题目：...
+- 现实背景/政策依据：...
+- 具体问题：...
+- 研究视角与方法：...
+```
+
+### 6) 文献综述 / 去 AI 味 / 口播视频
+
+```
+根据我给的文献清单写一份经济管理类文献综述：...
+```
+
+```
+帮我去掉这段中文的 AI 味：...
+```
+
+```
+把这篇文章做成口播视频：...
+```
+
+---
 
 ## 仓库结构
 
-```text
+```
 myskill/
-├── academic-literature-guide-v2/      学术文献导读
-├── coefplot/                          Stata 回归系数图
-├── econ-literature-review-writer/     经管文献综述
-├── peer-review/                       同行评议
-├── proposal-review-expert/            开题评审
-├── research-topic-selection/          科研选题全流程（v1.5.2）
-├── social-science-fund-topic-guide/   社科基金选题说明（500 字内）
-├── 社科基金题目评审/                  基金题目评审
-├── avoid-ai-writing/                  英文去 AI 味
-├── stop-ai-slop-zh/                   中文去 AI 味
-├── khazix-writer/                     公众号长文
-├── grill-me/                          拷打方案（基础版）
-├── grill-with-docs/                   拷打方案（带文档同步）
-├── mattpocock-grilling/               拷打方案（高强度版）
-├── ragflow-client/                    RAGflow 问答客户端
-├── mem0-memory-flow/                  Mem0 记忆管理工作流
-├── 口播视频制作/                      配音动画视频
-├── teach/                             技能教学
-├── delegate-task/                     OpenSpace 任务委托
-└── skill-discovery/                   OpenSpace 技能发现
+├── academic-literature-guide-v2/   # 文献导读（2.1.0）
+├── research-topic-selection/        # 科研选题（1.5.2）
+├── proposal-review-expert/           # 开题评审（2.0.0）
+├── peer-review/                     # 同行评议（2.0.0）
+├── social-science-fund-topic-guide/ # 社科基金选题说明
+├── 社科基金题目评审/                # 社科基金题目评审
+├── econ-literature-review-writer/   # 经管文献综述写作
+├── khazix-writer/                  # 公众号长文写作
+├── 口播视频制作/                   # 口播视频（1.0.0）
+├── coefplot/                       # Stata 系数图
+├── stop-ai-slop-zh/               # 中文去 AI 味
+├── avoid-ai-writing/              # 英文去 AI 味
+├── mem0-memory-flow/               # Mem0 记忆管理
+├── teach/                          # 教学
+├── grill-me/                       # 质询（无文档）
+├── grill-with-docs/                # 质询 + 文档
+├── skill-discovery/                # OpenSpace 技能发现
+├── delegate-task/                  # OpenSpace 任务委派
+├── ragflow-client/                 # RAGflow 知识库问答（2.0.0）
+├── README.md
+└── .gitignore
 ```
 
-## 文档入口
+---
 
-| 文档 | 说明 |
-|---|---|
-| [stop-ai-slop-zh/SKILL.md](./stop-ai-slop-zh/SKILL.md) | 中文去 AI 味定制版（六维量规） |
-| [academic-literature-guide-v2/README.md](./academic-literature-guide-v2/README.md) | 文献导读技能说明 |
-| [proposal-review-expert/README.md](./proposal-review-expert/README.md) | 开题报告评审说明 |
-| [peer-review/README.md](./peer-review/README.md) | 同行评议说明 |
-| [peer-review/templates.md](./peer-review/templates.md) | 同行评议输出模板 |
-| [peer-review/references.md](./peer-review/references.md) | 同行评议参考清单 |
-| [econ-literature-review-writer/README.md](./econ-literature-review-writer/README.md) | 经管类文献综述说明 |
-| [coefplot/docs/demo.md](./coefplot/docs/demo.md) | coefplot 场景示例 |
-| [ragflow-client/SKILL.md](./ragflow-client/SKILL.md) | RAGflow 客户端说明 |
-| [research-topic-selection/README.md](./research-topic-selection/README.md) | 科研选题系统说明（v1.5.2） |
-| [research-topic-selection/SKILL.md](./research-topic-selection/SKILL.md) | 科研选题核心流程与闸门规则 |
-| [research-topic-selection/references/](./research-topic-selection/references/) | 选题参考文档 |
-| [mem0-memory-flow/SKILL.md](./mem0-memory-flow/SKILL.md) | Mem0 记忆管理工作流说明 |
-| [delegate-task/SKILL.md](./delegate-task/SKILL.md) | OpenSpace 任务委托与技能自进化 |
-| [skill-discovery/SKILL.md](./skill-discovery/SKILL.md) | OpenSpace 技能搜索与发现 |
+## 相关链接
 
-## 说明
-
-- 各技能来源不完全一致，有的目录带 `_meta.json` 元数据文件，有的只有 `SKILL.md`，属于正常情况。
-- 敏感配置不要写死在 `SKILL.md` 或脚本里，优先使用环境变量或 `.env.local`。
-- 根目录 `README` 只维护总览；具体规则、触发方式和输出格式，以各目录内 `SKILL.md` 为准。
+- [OpenClaw / LobsterAI](https://github.com/openclaw/openclaw)
+- [ClawHub](https://clawhub.com)
+- [RAGflow](https://ragflow.io)
+- [Mem0](https://mem0.ai)

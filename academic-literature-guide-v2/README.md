@@ -1,4 +1,4 @@
-# 📚 文献导读助手 - 精简版
+# 📚 文献导读助手
 
 > **一键完成「PDF 提取→文献导读」全流程**  
 > 让学术论文阅读效率提升 300% 🚀
@@ -24,7 +24,6 @@
 
 ### 前置要求
 
-- [OpenClaw / LobsterAI](https://github.com/openclaw/openclaw) - 已安装并运行
 - [Node.js](https://nodejs.org/) - v16 或更高版本
 - [MinerU CLI](https://mineru.net) - PDF 提取工具
 
@@ -38,28 +37,16 @@ npm install -g mineru-open-api
 npm install -g mineru-open-api --prefix ~/.local
 ```
 
-### 2. 安装技能
-
-**macOS / Linux**:
-```bash
-cp -r academic-literature-guide-v2 ~/Library/Application\ Support/LobsterAI/SKILLs/
-```
-
-**Windows** (PowerShell):
-```powershell
-Copy-Item -Path "academic-literature-guide-v2" -Destination "$env:APPDATA\LobsterAI\SKILLs\" -Recurse
-```
-
-### 3. 配置 API Token（可选）
+### 2. 配置 API Token（可选）
 
 ```bash
 # 获取 Token: https://mineru.net/apiManage/token
 mineru-open-api auth
 ```
 
-### 4. 验证安装
+### 3. 验证安装
 
-在 LobsterAI 中发送：
+在支持该技能的 AI 助手环境中发送：
 ```
 文献导读技能
 ```
