@@ -31,6 +31,8 @@ memory/*.jsonl
 .reasonix/
 .mimocode/
 .skill_id
+.claude/
+.uploads/
 
 # ===== 选题工作目录（运行时产物）=====
 research-topic-selection/workspace_*/
